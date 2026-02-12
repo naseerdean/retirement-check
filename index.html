@@ -7,231 +7,209 @@
 
 <style>
 body{
-  margin:0;
-  font-family:-apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background:linear-gradient(180deg,#0f172a,#0b1220);
-  color:white;
-  padding:24px;
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+background:linear-gradient(135deg,#0c1626,#1b2a44);
+color:white;
+padding:40px 20px;
 }
-h1{font-size:28px;margin-bottom:10px;}
-h2{font-size:22px;margin-bottom:10px;}
-p{color:#cbd5e1;line-height:1.6;margin-bottom:14px;}
+
+h1{
+font-family:Georgia,serif;
+font-size:40px;
+margin-bottom:10px;
+}
+
+.subtitle{
+color:#cfd8e3;
+margin-bottom:40px;
+}
+
 .card{
-  background:#162235;
-  padding:24px;
-  border-radius:20px;
-  margin-top:20px;
+background:rgba(255,255,255,0.08);
+padding:30px;
+border-radius:20px;
+backdrop-filter:blur(10px);
+margin-bottom:30px;
 }
-input{
-  width:100%;
-  padding:16px;
-  margin-top:8px;
-  margin-bottom:18px;
-  font-size:18px;
-  border-radius:14px;
-  border:none;
-}
+
 button{
-  width:100%;
-  padding:16px;
-  font-size:18px;
-  font-weight:600;
-  border:none;
-  border-radius:16px;
-  background:#c8a75d;
-  color:#0f172a;
+background:#d4af37;
+color:#0c1626;
+padding:14px 28px;
+border:none;
+border-radius:14px;
+font-weight:bold;
+font-size:16px;
+margin-top:15px;
 }
-.secondary{
-  background:#263247;
-  color:white;
-  margin-top:12px;
+
+button.secondary{
+background:#2b3c58;
+color:white;
 }
+
+input{
+width:100%;
+padding:14px;
+margin-top:8px;
+margin-bottom:18px;
+border-radius:12px;
+border:none;
+font-size:16px;
+}
+
 .hidden{display:none;}
-.progress{
-  height:6px;
-  background:#263247;
-  border-radius:4px;
-  margin-bottom:24px;
+
+.result-box{
+padding:20px;
+border-radius:16px;
+margin-top:20px;
 }
-.bar{
-  height:6px;
-  background:#c8a75d;
-  border-radius:4px;
-  width:0%;
-  transition:width 0.4s ease;
-}
-.result{
-  margin-top:20px;
-  padding:20px;
-  border-radius:16px;
-}
-.red{background:#402026;}
-.orange{background:#403320;}
-.green{background:#1f3b2b;}
+
+.red{background:#5a2a2a;}
+.orange{background:#5a4b2a;}
+.green{background:#2a5a3a;}
+
 canvas{
-  background:white;
-  border-radius:16px;
-  margin-top:20px;
+background:white;
+border-radius:14px;
+margin-top:20px;
 }
+
 .small{
-  font-size:14px;
-  color:#94a3b8;
-  margin-top:20px;
-}
-.section-title{
-  font-weight:600;
-  color:#c8a75d;
-  margin-top:10px;
+font-size:12px;
+color:#cfd8e3;
+margin-top:40px;
 }
 </style>
 
 <script>
-
 let step=1;
 
-function updateProgress(){
-  document.getElementById("bar").style.width = (step*20)+"%";
-}
-
 function next(){
-  document.getElementById("step"+step).classList.add("hidden");
-  step++;
-  document.getElementById("step"+step).classList.remove("hidden");
-  updateProgress();
+document.getElementById("step"+step).classList.add("hidden");
+step++;
+document.getElementById("step"+step).classList.remove("hidden");
 }
 
 function back(){
-  document.getElementById("step"+step).classList.add("hidden");
-  step--;
-  document.getElementById("step"+step).classList.remove("hidden");
-  updateProgress();
+document.getElementById("step"+step).classList.add("hidden");
+step--;
+document.getElementById("step"+step).classList.remove("hidden");
 }
 
 function runModel(){
 
-  var capital = parseFloat(document.getElementById("capital").value) || 0;
-  var income = parseFloat(document.getElementById("income").value) || 0;
-  var pension = parseFloat(document.getElementById("pension").value) || 0;
-  var later = parseFloat(document.getElementById("later").value) || 0;
-  var ret = (parseFloat(document.getElementById("return").value) || 5)/100;
-  var inf = (parseFloat(document.getElementById("inflation").value) || 3)/100;
+let capital=parseFloat(document.getElementById("capital").value)||0;
+let income=parseFloat(document.getElementById("income").value)||0;
+let pension=parseFloat(document.getElementById("pension").value)||0;
+let later=parseFloat(document.getElementById("later").value)||0;
+let ret=(parseFloat(document.getElementById("return").value)||5)/100;
+let inf=(parseFloat(document.getElementById("inflation").value)||3)/100;
+let age=parseInt(document.getElementById("age").value)||67;
 
-  var draw1 = income - pension;
-  var draw2 = later - pension;
+let draw1=income-pension;
+let draw2=later-pension;
 
-  var rate1 = (draw1/capital)*100;
-  var rate2 = (draw2/capital)*100;
+let rate1=(draw1/capital)*100;
+let rate2=(draw2/capital)*100;
 
-  var balance = capital;
-  var balances=[];
-  var years=0;
+let balance=capital;
+let balances=[];
+let years=0;
 
-  for(var i=0;i<40;i++){
-      var withdrawal = (i<8?draw1:draw2) * Math.pow(1+inf,i);
-      balance = balance*(1+ret) - withdrawal;
-      if(balance<0){balance=0;}
-      balances.push(balance);
-      if(balance==0){break;}
-      years++;
-  }
+for(let i=0;i<40;i++){
+let withdrawal=(i<8?draw1:draw2)*Math.pow(1+inf,i);
+balance=balance*(1+ret)-withdrawal;
+if(balance<=0){balance=0;}
+balances.push(balance);
+if(balance===0){break;}
+years++;
+}
 
-  var depletionAge = 67 + years;
+let depletionAge=age+years;
 
-  var box=document.getElementById("output");
+let box=document.getElementById("output");
 
-  var commentary="";
+if(rate2>8){
+box.className="result-box red";
+box.innerHTML="<b>Structural mismatch identified.</b><br><br>Later-life withdrawal requirement is materially above common sustainable ranges (3–4%). Under the assumptions entered, capital may deplete around age "+depletionAge+".";
+}
+else if(rate2>4.5){
+box.className="result-box orange";
+box.innerHTML="<b>Structural pressure detected.</b><br><br>Later-life withdrawal requirements place pressure on long-term sustainability. Regular review and structural adjustments are advisable.";
+}
+else{
+box.className="result-box green";
+box.innerHTML="<b>Structure appears more resilient.</b><br><br>Under current assumptions, withdrawal rates remain within more sustainable ranges. Ongoing review remains important.";
+}
 
-  if(rate2>8){
-    box.className="result red";
-    commentary="Your required withdrawals in later life materially exceed sustainable levels. Without adjustment, capital may deplete around age "+depletionAge+".";
-  }
-  else if(rate2>4.5){
-    box.className="result orange";
-    commentary="Your structure may be vulnerable to inflation and sequencing risk. Later-life spending increases place pressure on sustainability.";
-  }
-  else{
-    box.className="result green";
-    commentary="Under current assumptions, your structure appears more resilient. However, regular review remains essential.";
-  }
-
-  box.innerHTML=
-  "<div class='section-title'>Current Phase Withdrawal Rate</div>"+rate1.toFixed(2)+"%<br><br>"
-  +"<div class='section-title'>Later-Life Stress Rate</div>"+rate2.toFixed(2)+"%<br><br>"
-  +"<div class='section-title'>Projected Capital Duration</div>Approximate depletion age: "+depletionAge+"<br><br>"
-  +commentary;
-
-  drawChart(balances);
-  next();
+drawChart(balances);
+next();
 }
 
 function drawChart(data){
-  var c=document.getElementById("chart");
-  var ctx=c.getContext("2d");
-  ctx.clearRect(0,0,c.width,c.height);
+let c=document.getElementById("chart");
+let ctx=c.getContext("2d");
+ctx.clearRect(0,0,c.width,c.height);
 
-  var max=Math.max(...data);
-  var w=c.width;
-  var h=c.height;
+let max=Math.max(...data);
+let w=c.width;
+let h=c.height;
 
-  ctx.beginPath();
-  ctx.moveTo(0,h-(data[0]/max*h));
+ctx.beginPath();
+ctx.moveTo(0,h-(data[0]/max*h));
 
-  for(var i=1;i<data.length;i++){
-    ctx.lineTo(i*(w/data.length),h-(data[i]/max*h));
-  }
-
-  ctx.strokeStyle="#c8a75d";
-  ctx.lineWidth=3;
-  ctx.stroke();
+for(let i=1;i<data.length;i++){
+ctx.lineTo(i*(w/data.length),h-(data[i]/max*h));
 }
 
+ctx.strokeStyle="#d4af37";
+ctx.lineWidth=3;
+ctx.stroke();
+}
 </script>
-
 </head>
 
 <body>
 
-<div class="progress"><div class="bar" id="bar"></div></div>
+<h1>Structured Retirement Income</h1>
+<div class="subtitle">Private wealth boutique diagnostic</div>
 
 <!-- STEP 1 -->
 <div id="step1">
-<h1>Will Your Retirement Income Sustain You — For Life?</h1>
-<p>Retirement planning is not simply about drawing income.</p>
-<p>It requires testing whether your capital can withstand:</p>
-<p>• Inflation over decades<br>
-• Market volatility<br>
-• Later-life care costs</p>
-<p>We assess your plan across two phases to test structural resilience.</p>
 <div class="card">
-<button onclick="next()">Begin Assessment</button>
+<h2>Will Your Retirement Survive Phase Two?</h2>
+<p>Most retirement plans assume steady spending.</p>
+<p>Few prepare for inflation, longevity, and rising later-life costs.</p>
+<p>If withdrawals exceed sustainable returns for prolonged periods, capital erosion accelerates — particularly after income step-changes.</p>
+<button onclick="next()">Begin Diagnostic</button>
 </div>
 </div>
 
 <!-- STEP 2 -->
 <div id="step2" class="hidden">
-<h2>Your Financial Foundation</h2>
-<p>Your investments must generate the income required after guaranteed sources such as State Pension are accounted for.</p>
 <div class="card">
-<label>Total invested capital (£)</label>
-<input type="number" id="capital" value="600000">
-<label>Income required each year (£)</label>
-<input type="number" id="income" value="45000">
-<label>Guaranteed income (State Pension etc.) (£)</label>
-<input type="number" id="pension" value="11500">
-<button onclick="next()">Next</button>
+<h2>Why This Matters</h2>
+<p>• Inflation compounds quietly over decades<br>
+• Withdrawal rates above 4% can pressure sustainability<br>
+• Later-life care costs can materially increase income needs<br>
+• Markets do not move in straight lines</p>
+<p>This structured diagnostic reveals withdrawal-rate pressure — not market forecasts.</p>
+<button onclick="next()">Check My Position</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
 <!-- STEP 3 -->
 <div id="step3" class="hidden">
-<h2>Understanding Phase Two</h2>
-<p>In early retirement, spending may remain stable.</p>
-<p>However, later in life, mobility, health, or support requirements can increase costs significantly.</p>
-<p>We model this separately to test whether your structure remains sustainable.</p>
 <div class="card">
-<label>Potential later-life annual income requirement (£)</label>
-<input type="number" id="later" value="80000">
+<h2>Step 1 — Your Position</h2>
+<label>Total invested capital (£)</label>
+<input type="number" id="capital" value="600000">
+<label>Current age</label>
+<input type="number" id="age" value="67">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
@@ -239,32 +217,59 @@ function drawChart(data){
 
 <!-- STEP 4 -->
 <div id="step4" class="hidden">
-<h2>Assumptions & Economic Conditions</h2>
-<p>Returns fluctuate and inflation compounds over time.</p>
-<p>We use conservative long-term assumptions to test resilience.</p>
 <div class="card">
-<label>Expected long-term return (%)</label>
-<input type="number" id="return" value="5">
-<label>Expected inflation (%)</label>
-<input type="number" id="inflation" value="3">
-<button onclick="runModel()">View Structural Outcome</button>
+<h2>Step 2 — Income Needs</h2>
+<label>Required income per year (£)</label>
+<input type="number" id="income" value="45000">
+<label>Guaranteed income (State Pension / annuity) (£)</label>
+<input type="number" id="pension" value="11500">
+<p>We calculate portfolio draw required after guaranteed income.</p>
+<button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
 <!-- STEP 5 -->
 <div id="step5" class="hidden">
-<h2>Your Structural Outcome</h2>
-<div id="output"></div>
-<canvas id="chart" width="350" height="220"></canvas>
 <div class="card">
-<button>Request Confidential Consultation</button>
+<h2>Step 3 — Phase Two (later life)</h2>
+<label>Later-life income requirement (£)</label>
+<input type="number" id="later" value="80000">
+<p>Later-life care or support can significantly increase annual costs. We model this separately to test structural resilience.</p>
+<button onclick="next()">Next</button>
+<button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<p class="small">
-Illustrative modelling only. Not financial advice. Assumptions are adjustable and outcomes depend on market conditions.
-</p>
+<!-- STEP 6 -->
+<div id="step6" class="hidden">
+<div class="card">
+<h2>Step 4 — Assumptions</h2>
+<label>Expected return (%) (default 5%)</label>
+<input type="number" id="return" value="5">
+<label>Expected inflation (%) (typical 3–4%)</label>
+<input type="number" id="inflation" value="3">
+<p>This uses a simple net return assumption and inflates withdrawals annually. Designed to reveal structural withdrawal-rate pressure rather than predict markets.</p>
+<button onclick="runModel()">View Structural Diagnosis</button>
+<button class="secondary" onclick="back()">Back</button>
+</div>
+</div>
+
+<!-- STEP 7 -->
+<div id="step7" class="hidden">
+<div class="card">
+<h2>Step 5 — Structural Diagnosis</h2>
+<div id="output"></div>
+<canvas id="chart" width="320" height="200"></canvas>
+<p><b>What structured planning changes:</b><br>
+Build an income floor. Match predictable liabilities with lower-volatility assets (in a ~5% yield environment). Retain a growth reserve for longevity.</p>
+<button>Request Confidential Review</button>
+</div>
+</div>
+
+<div class="small">
+Illustrative modelling only. Not personal financial advice. Investment values can fall as well as rise.
+</div>
 
 </body>
 </html>
