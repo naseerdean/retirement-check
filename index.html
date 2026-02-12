@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structured Retirement Income</title>
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  background:#0e1624;
+  color:white;
+  padding:20px;
+}
+h1{font-size:28px;margin-bottom:5px;}
+p{color:#cbd5e1;}
+.card{
+  background:#162235;
+  padding:20px;
+  border-radius:16px;
+  margin-top:20px;
+}
+input{
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  margin-bottom:16px;
+  font-size:18px;
+  border-radius:10px;
+  border:none;
+}
+button{
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  border:none;
+  border-radius:12px;
+  background:#c8a75d;
+  color:#0e1624;
+}
+.result{
+  margin-top:20px;
+  padding:16px;
+  border-radius:12px;
+}
+.red{background:#402026;}
+.orange{background:#403320;}
+.green{background:#1f3b2b;}
+.small{
+  font-size:14px;
+  color:#94a3b8;
+}
+</style>
+
+<script>
+function runModel(){
+
+  var capital = parseFloat(document.getElementById("capital").value) || 0;
+  var income = parseFloat(document.getElementById("income").value) || 0;
+  var pension = parseFloat(document.getElementById("pension").value) || 0;
+  var later = parseFloat(document.getElementById("later").value) || 0;
+  var ret = (parseFloat(document.getElementById("return").value) || 5)/100;
+  var inf = (parseFloat(document.getElementById("inflation").value) || 3)/100;
+
+  var draw1 = income - pension;
+  var draw2 = later - pension;
+
+  var rate1 = (draw1 / capital) * 100;
+  var rate2 = (draw2 / capital) * 100;
+
+  var balance = capital;
+  var years = 0;
+
+  for(var i=0;i<40;i++){
+      var withdrawal = (i<8?draw1:draw2) * Math.pow(1+inf,i);
+      balance = balance*(1+ret) - withdrawal;
+      if(balance<=0){ break; }
+      years++;
+  }
+
+  var depletionAge = 67 + years;
+
+  var box = document.getElementById("output");
+
+  if(rate2 > 8){
+      box.className="result red";
+      box.innerHTML="<b>Structural Mismatch Identified</b><br><br>"
+      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br>"
+      +"Projected depletion age: "+depletionAge+"<br><br>"
+      +"This materially exceeds sustainable withdrawal benchmarks (3–4%).";
+  }
+  else if(rate2 > 4.5){
+      box.className="result orange";
+      box.innerHTML="<b>Moderate Structural Risk</b><br><br>"
+      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br>"
+      +"Projected depletion age: "+depletionAge+"<br><br>"
+      +"Outcome is sensitive to inflation and return sequencing.";
+  }
+  else{
+      box.className="result green";
+      box.innerHTML="<b>Lower Structural Risk</b><br><br>"
+      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br><br>"
+      +"Closer to sustainable benchmarks under current assumptions.";
+  }
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>Structured Retirement Income</h1>
+<p>Phase-based sustainability diagnostic</p>
+
+<div class="card">
+
+<label>Total Capital (£)</label>
+<input type="number" id="capital" value="600000">
+
+<label>Income Required (£)</label>
+<input type="number" id="income" value="45000">
+
+<label>State Pension / Guaranteed Income (£)</label>
+<input type="number" id="pension" value="11500">
+
+<label>Later-Life Income Requirement (£)</label>
+<input type="number" id="later" value="80000">
+
+<label>Expected Return (%)</label>
+<input type="number" id="return" value="5">
+
+<label>Inflation (%)</label>
+<input type="number" id="inflation" value="3">
+
+<button onclick="runModel()">Run Analysis</button>
+
+<div id="output"></div>
+
+</div>
+
+<p class="small">
+Illustrative modelling only. Not financial advice.
+</p>
+
+</body>
+</html>
