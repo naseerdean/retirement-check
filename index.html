@@ -9,25 +9,26 @@
 body{
   margin:0;
   font-family:-apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background:#0e1624;
+  background:linear-gradient(180deg,#0e1624,#0b1120);
   color:white;
-  padding:20px;
+  padding:24px;
 }
-h1{font-size:28px;margin-bottom:5px;}
-p{color:#cbd5e1;}
+h1{font-size:28px;margin-bottom:10px;}
+h2{font-size:22px;margin-bottom:10px;}
+p{color:#cbd5e1;line-height:1.6;}
 .card{
   background:#162235;
-  padding:20px;
-  border-radius:16px;
+  padding:22px;
+  border-radius:18px;
   margin-top:20px;
 }
 input{
   width:100%;
-  padding:14px;
+  padding:16px;
   margin-top:8px;
-  margin-bottom:16px;
+  margin-bottom:18px;
   font-size:18px;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
 }
 button{
@@ -36,25 +37,65 @@ button{
   font-size:18px;
   font-weight:bold;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   background:#c8a75d;
   color:#0e1624;
 }
+.secondary{
+  background:#24324a;
+  color:white;
+}
+.hidden{display:none;}
+.progress{
+  height:6px;
+  background:#24324a;
+  border-radius:4px;
+  margin-bottom:20px;
+}
+.bar{
+  height:6px;
+  background:#c8a75d;
+  border-radius:4px;
+  width:0%;
+}
 .result{
   margin-top:20px;
-  padding:16px;
-  border-radius:12px;
+  padding:18px;
+  border-radius:14px;
 }
 .red{background:#402026;}
 .orange{background:#403320;}
 .green{background:#1f3b2b;}
-.small{
-  font-size:14px;
-  color:#94a3b8;
+canvas{
+  background:white;
+  border-radius:14px;
+  margin-top:20px;
 }
+.small{font-size:14px;color:#94a3b8;}
 </style>
 
 <script>
+
+let step=1;
+
+function updateProgress(){
+  document.getElementById("bar").style.width = (step*20)+"%";
+}
+
+function next(){
+  document.getElementById("step"+step).classList.add("hidden");
+  step++;
+  document.getElementById("step"+step).classList.remove("hidden");
+  updateProgress();
+}
+
+function back(){
+  document.getElementById("step"+step).classList.add("hidden");
+  step--;
+  document.getElementById("step"+step).classList.remove("hidden");
+  updateProgress();
+}
+
 function runModel(){
 
   var capital = parseFloat(document.getElementById("capital").value) || 0;
@@ -67,77 +108,130 @@ function runModel(){
   var draw1 = income - pension;
   var draw2 = later - pension;
 
-  var rate1 = (draw1 / capital) * 100;
-  var rate2 = (draw2 / capital) * 100;
-
   var balance = capital;
-  var years = 0;
+  var balances=[];
+  var years=0;
 
   for(var i=0;i<40;i++){
       var withdrawal = (i<8?draw1:draw2) * Math.pow(1+inf,i);
       balance = balance*(1+ret) - withdrawal;
-      if(balance<=0){ break; }
+      if(balance<0){balance=0;}
+      balances.push(balance);
+      if(balance==0){break;}
       years++;
   }
 
   var depletionAge = 67 + years;
+  var rate2 = (draw2/capital)*100;
 
-  var box = document.getElementById("output");
+  var box=document.getElementById("output");
 
-  if(rate2 > 8){
-      box.className="result red";
-      box.innerHTML="<b>Structural Mismatch Identified</b><br><br>"
-      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br>"
-      +"Projected depletion age: "+depletionAge+"<br><br>"
-      +"This materially exceeds sustainable withdrawal benchmarks (3–4%).";
+  if(rate2>8){
+    box.className="result red";
+    box.innerHTML="<b>Your Plan May Not Sustain Later-Life Costs</b><br><br>"
+    +"Capital could deplete around age "+depletionAge+".";
   }
-  else if(rate2 > 4.5){
-      box.className="result orange";
-      box.innerHTML="<b>Moderate Structural Risk</b><br><br>"
-      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br>"
-      +"Projected depletion age: "+depletionAge+"<br><br>"
-      +"Outcome is sensitive to inflation and return sequencing.";
+  else if(rate2>4.5){
+    box.className="result orange";
+    box.innerHTML="<b>Your Plan Is Sensitive To Inflation</b><br><br>"
+    +"Later-life costs may place pressure on savings.";
   }
   else{
-      box.className="result green";
-      box.innerHTML="<b>Lower Structural Risk</b><br><br>"
-      +"Later-life withdrawal rate: "+rate2.toFixed(2)+"%<br><br>"
-      +"Closer to sustainable benchmarks under current assumptions.";
+    box.className="result green";
+    box.innerHTML="<b>Your Plan Appears More Resilient</b><br><br>"
+    +"Under current assumptions your structure looks stronger.";
   }
+
+  drawChart(balances);
+  next();
 }
+
+function drawChart(data){
+  var c=document.getElementById("chart");
+  var ctx=c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+
+  var max=Math.max(...data);
+  var w=c.width;
+  var h=c.height;
+
+  ctx.beginPath();
+  ctx.moveTo(0,h-(data[0]/max*h));
+
+  for(var i=1;i<data.length;i++){
+    ctx.lineTo(i*(w/data.length),h-(data[i]/max*h));
+  }
+
+  ctx.strokeStyle="#c8a75d";
+  ctx.lineWidth=3;
+  ctx.stroke();
+}
+
 </script>
 
 </head>
 
 <body>
 
-<h1>Structured Retirement Income</h1>
-<p>Phase-based sustainability diagnostic</p>
+<div class="progress"><div class="bar" id="bar"></div></div>
 
+<!-- STEP 1 -->
+<div id="step1">
+<h1>Will Your Retirement Income Last?</h1>
+<p>We help you test whether your income survives inflation, markets, and later-life costs.</p>
 <div class="card">
+<button onclick="next()">Begin</button>
+</div>
+</div>
 
-<label>Total Capital (£)</label>
+<!-- STEP 2 -->
+<div id="step2" class="hidden">
+<h2>Your Position</h2>
+<div class="card">
+<label>Total savings (£)</label>
 <input type="number" id="capital" value="600000">
-
-<label>Income Required (£)</label>
+<label>Income needed each year (£)</label>
 <input type="number" id="income" value="45000">
-
-<label>State Pension / Guaranteed Income (£)</label>
+<label>State Pension / Guaranteed income (£)</label>
 <input type="number" id="pension" value="11500">
+<button onclick="next()">Next</button>
+<button class="secondary" onclick="back()">Back</button>
+</div>
+</div>
 
-<label>Later-Life Income Requirement (£)</label>
+<!-- STEP 3 -->
+<div id="step3" class="hidden">
+<h2>Why Phase Two?</h2>
+<p>Later in life, spending often rises due to health or care needs.</p>
+<div class="card">
+<label>Income you may need later (£)</label>
 <input type="number" id="later" value="80000">
+<button onclick="next()">Next</button>
+<button class="secondary" onclick="back()">Back</button>
+</div>
+</div>
 
-<label>Expected Return (%)</label>
+<!-- STEP 4 -->
+<div id="step4" class="hidden">
+<h2>Assumptions</h2>
+<div class="card">
+<label>Expected return (%)</label>
 <input type="number" id="return" value="5">
-
 <label>Inflation (%)</label>
 <input type="number" id="inflation" value="3">
+<button onclick="runModel()">See My Result</button>
+<button class="secondary" onclick="back()">Back</button>
+</div>
+</div>
 
-<button onclick="runModel()">Run Analysis</button>
-
+<!-- STEP 5 -->
+<div id="step5" class="hidden">
+<h2>Your Outcome</h2>
 <div id="output"></div>
-
+<canvas id="chart" width="350" height="200"></canvas>
+<div class="card">
+<button>Request Confidential Review</button>
+</div>
 </div>
 
 <p class="small">
