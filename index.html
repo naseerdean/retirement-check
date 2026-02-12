@@ -9,17 +9,17 @@
 body{
   margin:0;
   font-family:-apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background:linear-gradient(180deg,#0e1624,#0b1120);
+  background:linear-gradient(180deg,#0f172a,#0b1220);
   color:white;
   padding:24px;
 }
 h1{font-size:28px;margin-bottom:10px;}
 h2{font-size:22px;margin-bottom:10px;}
-p{color:#cbd5e1;line-height:1.6;}
+p{color:#cbd5e1;line-height:1.6;margin-bottom:14px;}
 .card{
   background:#162235;
-  padding:22px;
-  border-radius:18px;
+  padding:24px;
+  border-radius:20px;
   margin-top:20px;
 }
 input{
@@ -28,50 +28,61 @@ input{
   margin-top:8px;
   margin-bottom:18px;
   font-size:18px;
-  border-radius:12px;
+  border-radius:14px;
   border:none;
 }
 button{
   width:100%;
   padding:16px;
   font-size:18px;
-  font-weight:bold;
+  font-weight:600;
   border:none;
-  border-radius:14px;
+  border-radius:16px;
   background:#c8a75d;
-  color:#0e1624;
+  color:#0f172a;
 }
 .secondary{
-  background:#24324a;
+  background:#263247;
   color:white;
+  margin-top:12px;
 }
 .hidden{display:none;}
 .progress{
   height:6px;
-  background:#24324a;
+  background:#263247;
   border-radius:4px;
-  margin-bottom:20px;
+  margin-bottom:24px;
 }
 .bar{
   height:6px;
   background:#c8a75d;
   border-radius:4px;
   width:0%;
+  transition:width 0.4s ease;
 }
 .result{
   margin-top:20px;
-  padding:18px;
-  border-radius:14px;
+  padding:20px;
+  border-radius:16px;
 }
 .red{background:#402026;}
 .orange{background:#403320;}
 .green{background:#1f3b2b;}
 canvas{
   background:white;
-  border-radius:14px;
+  border-radius:16px;
   margin-top:20px;
 }
-.small{font-size:14px;color:#94a3b8;}
+.small{
+  font-size:14px;
+  color:#94a3b8;
+  margin-top:20px;
+}
+.section-title{
+  font-weight:600;
+  color:#c8a75d;
+  margin-top:10px;
+}
 </style>
 
 <script>
@@ -108,6 +119,9 @@ function runModel(){
   var draw1 = income - pension;
   var draw2 = later - pension;
 
+  var rate1 = (draw1/capital)*100;
+  var rate2 = (draw2/capital)*100;
+
   var balance = capital;
   var balances=[];
   var years=0;
@@ -122,25 +136,29 @@ function runModel(){
   }
 
   var depletionAge = 67 + years;
-  var rate2 = (draw2/capital)*100;
 
   var box=document.getElementById("output");
 
+  var commentary="";
+
   if(rate2>8){
     box.className="result red";
-    box.innerHTML="<b>Your Plan May Not Sustain Later-Life Costs</b><br><br>"
-    +"Capital could deplete around age "+depletionAge+".";
+    commentary="Your required withdrawals in later life materially exceed sustainable levels. Without adjustment, capital may deplete around age "+depletionAge+".";
   }
   else if(rate2>4.5){
     box.className="result orange";
-    box.innerHTML="<b>Your Plan Is Sensitive To Inflation</b><br><br>"
-    +"Later-life costs may place pressure on savings.";
+    commentary="Your structure may be vulnerable to inflation and sequencing risk. Later-life spending increases place pressure on sustainability.";
   }
   else{
     box.className="result green";
-    box.innerHTML="<b>Your Plan Appears More Resilient</b><br><br>"
-    +"Under current assumptions your structure looks stronger.";
+    commentary="Under current assumptions, your structure appears more resilient. However, regular review remains essential.";
   }
+
+  box.innerHTML=
+  "<div class='section-title'>Current Phase Withdrawal Rate</div>"+rate1.toFixed(2)+"%<br><br>"
+  +"<div class='section-title'>Later-Life Stress Rate</div>"+rate2.toFixed(2)+"%<br><br>"
+  +"<div class='section-title'>Projected Capital Duration</div>Approximate depletion age: "+depletionAge+"<br><br>"
+  +commentary;
 
   drawChart(balances);
   next();
@@ -177,22 +195,28 @@ function drawChart(data){
 
 <!-- STEP 1 -->
 <div id="step1">
-<h1>Will Your Retirement Income Last?</h1>
-<p>We help you test whether your income survives inflation, markets, and later-life costs.</p>
+<h1>Will Your Retirement Income Sustain You — For Life?</h1>
+<p>Retirement planning is not simply about drawing income.</p>
+<p>It requires testing whether your capital can withstand:</p>
+<p>• Inflation over decades<br>
+• Market volatility<br>
+• Later-life care costs</p>
+<p>We assess your plan across two phases to test structural resilience.</p>
 <div class="card">
-<button onclick="next()">Begin</button>
+<button onclick="next()">Begin Assessment</button>
 </div>
 </div>
 
 <!-- STEP 2 -->
 <div id="step2" class="hidden">
-<h2>Your Position</h2>
+<h2>Your Financial Foundation</h2>
+<p>Your investments must generate the income required after guaranteed sources such as State Pension are accounted for.</p>
 <div class="card">
-<label>Total savings (£)</label>
+<label>Total invested capital (£)</label>
 <input type="number" id="capital" value="600000">
-<label>Income needed each year (£)</label>
+<label>Income required each year (£)</label>
 <input type="number" id="income" value="45000">
-<label>State Pension / Guaranteed income (£)</label>
+<label>Guaranteed income (State Pension etc.) (£)</label>
 <input type="number" id="pension" value="11500">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
@@ -201,10 +225,12 @@ function drawChart(data){
 
 <!-- STEP 3 -->
 <div id="step3" class="hidden">
-<h2>Why Phase Two?</h2>
-<p>Later in life, spending often rises due to health or care needs.</p>
+<h2>Understanding Phase Two</h2>
+<p>In early retirement, spending may remain stable.</p>
+<p>However, later in life, mobility, health, or support requirements can increase costs significantly.</p>
+<p>We model this separately to test whether your structure remains sustainable.</p>
 <div class="card">
-<label>Income you may need later (£)</label>
+<label>Potential later-life annual income requirement (£)</label>
 <input type="number" id="later" value="80000">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
@@ -213,29 +239,31 @@ function drawChart(data){
 
 <!-- STEP 4 -->
 <div id="step4" class="hidden">
-<h2>Assumptions</h2>
+<h2>Assumptions & Economic Conditions</h2>
+<p>Returns fluctuate and inflation compounds over time.</p>
+<p>We use conservative long-term assumptions to test resilience.</p>
 <div class="card">
-<label>Expected return (%)</label>
+<label>Expected long-term return (%)</label>
 <input type="number" id="return" value="5">
-<label>Inflation (%)</label>
+<label>Expected inflation (%)</label>
 <input type="number" id="inflation" value="3">
-<button onclick="runModel()">See My Result</button>
+<button onclick="runModel()">View Structural Outcome</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
 <!-- STEP 5 -->
 <div id="step5" class="hidden">
-<h2>Your Outcome</h2>
+<h2>Your Structural Outcome</h2>
 <div id="output"></div>
-<canvas id="chart" width="350" height="200"></canvas>
+<canvas id="chart" width="350" height="220"></canvas>
 <div class="card">
-<button>Request Confidential Review</button>
+<button>Request Confidential Consultation</button>
 </div>
 </div>
 
 <p class="small">
-Illustrative modelling only. Not financial advice.
+Illustrative modelling only. Not financial advice. Assumptions are adjustable and outcomes depend on market conditions.
 </p>
 
 </body>
