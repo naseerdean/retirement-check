@@ -16,7 +16,7 @@ padding:40px 20px;
 
 h1{
 font-family:Georgia,serif;
-font-size:40px;
+font-size:38px;
 margin-bottom:10px;
 }
 
@@ -27,16 +27,16 @@ margin-bottom:40px;
 
 .card{
 background:rgba(255,255,255,0.08);
-padding:30px;
+padding:28px;
 border-radius:20px;
-backdrop-filter:blur(10px);
+backdrop-filter:blur(12px);
 margin-bottom:30px;
 }
 
 button{
 background:#d4af37;
 color:#0c1626;
-padding:14px 28px;
+padding:14px 26px;
 border:none;
 border-radius:14px;
 font-weight:bold;
@@ -47,6 +47,7 @@ margin-top:15px;
 button.secondary{
 background:#2b3c58;
 color:white;
+margin-left:10px;
 }
 
 input{
@@ -65,6 +66,7 @@ font-size:16px;
 padding:20px;
 border-radius:16px;
 margin-top:20px;
+line-height:1.6;
 }
 
 .red{background:#5a2a2a;}
@@ -91,12 +93,14 @@ function next(){
 document.getElementById("step"+step).classList.add("hidden");
 step++;
 document.getElementById("step"+step).classList.remove("hidden");
+window.scrollTo(0,0);
 }
 
 function back(){
 document.getElementById("step"+step).classList.add("hidden");
 step--;
 document.getElementById("step"+step).classList.remove("hidden");
+window.scrollTo(0,0);
 }
 
 function runModel(){
@@ -132,17 +136,44 @@ let depletionAge=age+years;
 
 let box=document.getElementById("output");
 
+let draw1Formatted=draw1.toLocaleString();
+let draw2Formatted=draw2.toLocaleString();
+
+let explanation = `
+<b>What this means:</b><br><br>
+Your portfolio draw is <b>£${draw1Formatted}</b> per year today 
+and <b>£${draw2Formatted}</b> in Phase Two (both inflation-linked).<br><br>
+If withdrawals exceed portfolio growth for prolonged periods, 
+capital erosion accelerates — particularly after the Phase Two step-change.
+`;
+
 if(rate2>8){
 box.className="result-box red";
-box.innerHTML="<b>Structural mismatch identified.</b><br><br>Later-life withdrawal requirement is materially above common sustainable ranges (3–4%). Under the assumptions entered, capital may deplete around age "+depletionAge+".";
+box.innerHTML= explanation + `
+<br><br><b>Structural mismatch identified.</b><br>
+Later-life withdrawal requirement is materially above common sustainable ranges (3–4%).<br>
+Under the assumptions entered, capital may deplete around age <b>${depletionAge}</b>.<br><br>
+<b>What structured planning changes:</b><br>
+• Build an income floor<br>
+• Match predictable liabilities with lower-volatility assets (in a ~5% yield environment)<br>
+• Retain a growth reserve for longevity
+`;
 }
 else if(rate2>4.5){
 box.className="result-box orange";
-box.innerHTML="<b>Structural pressure detected.</b><br><br>Later-life withdrawal requirements place pressure on long-term sustainability. Regular review and structural adjustments are advisable.";
+box.innerHTML= explanation + `
+<br><br><b>Structural pressure detected.</b><br>
+Later-life withdrawal requirements place pressure on long-term sustainability.<br><br>
+<b>Structured adjustments may improve resilience.</b>
+`;
 }
 else{
 box.className="result-box green";
-box.innerHTML="<b>Structure appears more resilient.</b><br><br>Under current assumptions, withdrawal rates remain within more sustainable ranges. Ongoing review remains important.";
+box.innerHTML= explanation + `
+<br><br><b>Structure appears more resilient.</b><br>
+Under current assumptions, withdrawal rates remain within more sustainable ranges.<br><br>
+Ongoing review remains important.
+`;
 }
 
 drawChart(balances);
@@ -175,7 +206,7 @@ ctx.stroke();
 <body>
 
 <h1>Structured Retirement Income</h1>
-<div class="subtitle">Private wealth boutique diagnostic</div>
+<div class="subtitle">Standalone • Private wealth boutique diagnostic</div>
 
 <!-- STEP 1 -->
 <div id="step1">
@@ -183,7 +214,7 @@ ctx.stroke();
 <h2>Will Your Retirement Survive Phase Two?</h2>
 <p>Most retirement plans assume steady spending.</p>
 <p>Few prepare for inflation, longevity, and rising later-life costs.</p>
-<p>If withdrawals exceed sustainable returns for prolonged periods, capital erosion accelerates — particularly after income step-changes.</p>
+<p>If withdrawals exceed sustainable returns for prolonged periods, capital erosion accelerates — especially after income step-changes.</p>
 <button onclick="next()">Begin Diagnostic</button>
 </div>
 </div>
@@ -192,11 +223,13 @@ ctx.stroke();
 <div id="step2" class="hidden">
 <div class="card">
 <h2>Why This Matters</h2>
-<p>• Inflation compounds quietly over decades<br>
+<p>
+• Inflation compounds quietly over decades<br>
 • Withdrawal rates above 4% can pressure sustainability<br>
 • Later-life care costs can materially increase income needs<br>
-• Markets do not move in straight lines</p>
-<p>This structured diagnostic reveals withdrawal-rate pressure — not market forecasts.</p>
+• Markets do not move in straight lines
+</p>
+<p>This diagnostic reveals structural withdrawal-rate pressure — not market forecasts.</p>
 <button onclick="next()">Check My Position</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
@@ -223,7 +256,7 @@ ctx.stroke();
 <input type="number" id="income" value="45000">
 <label>Guaranteed income (State Pension / annuity) (£)</label>
 <input type="number" id="pension" value="11500">
-<p>We calculate portfolio draw required after guaranteed income.</p>
+<p>We calculate the portfolio draw required after guaranteed income.</p>
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
@@ -235,7 +268,7 @@ ctx.stroke();
 <h2>Step 3 — Phase Two (later life)</h2>
 <label>Later-life income requirement (£)</label>
 <input type="number" id="later" value="80000">
-<p>Later-life care or support can significantly increase annual costs. We model this separately to test structural resilience.</p>
+<p>Later-life healthcare or residential support can significantly increase annual costs. We model this separately to test structural resilience.</p>
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
@@ -261,8 +294,6 @@ ctx.stroke();
 <h2>Step 5 — Structural Diagnosis</h2>
 <div id="output"></div>
 <canvas id="chart" width="320" height="200"></canvas>
-<p><b>What structured planning changes:</b><br>
-Build an income floor. Match predictable liabilities with lower-volatility assets (in a ~5% yield environment). Retain a growth reserve for longevity.</p>
 <button>Request Confidential Review</button>
 </div>
 </div>
