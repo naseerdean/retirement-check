@@ -29,8 +29,9 @@ margin-bottom:40px;
 background:rgba(255,255,255,0.08);
 padding:28px;
 border-radius:20px;
-backdrop-filter:blur(12px);
+backdrop-filter:blur(14px);
 margin-bottom:30px;
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
 }
 
 button{
@@ -42,6 +43,12 @@ border-radius:14px;
 font-weight:bold;
 font-size:16px;
 margin-top:15px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
 }
 
 button.secondary{
@@ -50,7 +57,7 @@ color:white;
 margin-left:10px;
 }
 
-input{
+input, textarea{
 width:100%;
 padding:14px;
 margin-top:8px;
@@ -67,6 +74,12 @@ padding:20px;
 border-radius:16px;
 margin-top:20px;
 line-height:1.6;
+animation:fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
 }
 
 .red{background:#5a2a2a;}
@@ -116,7 +129,6 @@ let age=parseInt(document.getElementById("age").value)||67;
 let draw1=income-pension;
 let draw2=later-pension;
 
-let rate1=(draw1/capital)*100;
 let rate2=(draw2/capital)*100;
 
 let balance=capital;
@@ -143,44 +155,40 @@ let explanation = `
 <b>What this means:</b><br><br>
 Your portfolio draw is <b>£${draw1Formatted}</b> per year today 
 and <b>£${draw2Formatted}</b> in Phase Two (both inflation-linked).<br><br>
-If withdrawals exceed portfolio growth for prolonged periods, 
-capital erosion accelerates — particularly after the Phase Two step-change.
+If withdrawals exceed growth, capital erosion accelerates — particularly after the Phase Two step-change.
 `;
 
 if(rate2>8){
 box.className="result-box red";
 box.innerHTML= explanation + `
 <br><br><b>Structural mismatch identified.</b><br>
-Later-life withdrawal requirement is materially above common sustainable ranges (3–4%).<br>
-Under the assumptions entered, capital may deplete around age <b>${depletionAge}</b>.<br><br>
-<b>What structured planning changes:</b><br>
-• Build an income floor<br>
-• Match predictable liabilities with lower-volatility assets (in a ~5% yield environment)<br>
-• Retain a growth reserve for longevity
+Under these assumptions, capital may deplete around age <b>${depletionAge}</b>.<br><br>
+<b>Structured planning may include:</b><br>
+• Income floor creation<br>
+• Liability matching using ~5% fixed income<br>
+• Growth reserve for longevity
 `;
 }
 else if(rate2>4.5){
 box.className="result-box orange";
 box.innerHTML= explanation + `
 <br><br><b>Structural pressure detected.</b><br>
-Later-life withdrawal requirements place pressure on long-term sustainability.<br><br>
-<b>Structured adjustments may improve resilience.</b>
+Long-term sustainability may require adjustment.
 `;
 }
 else{
 box.className="result-box green";
 box.innerHTML= explanation + `
 <br><br><b>Structure appears more resilient.</b><br>
-Under current assumptions, withdrawal rates remain within more sustainable ranges.<br><br>
-Ongoing review remains important.
+Withdrawal rates remain within more sustainable ranges.
 `;
 }
 
-drawChart(balances);
+drawChart(balances,8);
 next();
 }
 
-function drawChart(data){
+function drawChart(data,phaseYear){
 let c=document.getElementById("chart");
 let ctx=c.getContext("2d");
 ctx.clearRect(0,0,c.width,c.height);
@@ -199,6 +207,14 @@ ctx.lineTo(i*(w/data.length),h-(data[i]/max*h));
 ctx.strokeStyle="#d4af37";
 ctx.lineWidth=3;
 ctx.stroke();
+
+/* Phase Two marker */
+let x=phaseYear*(w/data.length);
+ctx.beginPath();
+ctx.moveTo(x,0);
+ctx.lineTo(x,h);
+ctx.strokeStyle="#888";
+ctx.stroke();
 }
 </script>
 </head>
@@ -206,100 +222,84 @@ ctx.stroke();
 <body>
 
 <h1>Structured Retirement Income</h1>
-<div class="subtitle">Standalone • Private wealth boutique diagnostic</div>
+<div class="subtitle">Private wealth boutique diagnostic</div>
 
-<!-- STEP 1 -->
 <div id="step1">
 <div class="card">
 <h2>Will Your Retirement Survive Phase Two?</h2>
 <p>Most retirement plans assume steady spending.</p>
 <p>Few prepare for inflation, longevity, and rising later-life costs.</p>
-<p>If withdrawals exceed sustainable returns for prolonged periods, capital erosion accelerates — especially after income step-changes.</p>
 <button onclick="next()">Begin Diagnostic</button>
 </div>
 </div>
 
-<!-- STEP 2 -->
 <div id="step2" class="hidden">
 <div class="card">
 <h2>Why This Matters</h2>
-<p>
-• Inflation compounds quietly over decades<br>
-• Withdrawal rates above 4% can pressure sustainability<br>
-• Later-life care costs can materially increase income needs<br>
-• Markets do not move in straight lines
-</p>
-<p>This diagnostic reveals structural withdrawal-rate pressure — not market forecasts.</p>
-<button onclick="next()">Check My Position</button>
+<p>Inflation, longevity and later-life costs can create structural strain.</p>
+<button onclick="next()">Continue</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- STEP 3 -->
 <div id="step3" class="hidden">
 <div class="card">
-<h2>Step 1 — Your Position</h2>
-<label>Total invested capital (£)</label>
-<input type="number" id="capital" value="600000">
-<label>Current age</label>
-<input type="number" id="age" value="67">
+<h2>Your Position</h2>
+<input type="number" id="capital" value="600000" placeholder="Total invested capital (£)">
+<input type="number" id="age" value="67" placeholder="Current age">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- STEP 4 -->
 <div id="step4" class="hidden">
 <div class="card">
-<h2>Step 2 — Income Needs</h2>
-<label>Required income per year (£)</label>
-<input type="number" id="income" value="45000">
-<label>Guaranteed income (State Pension / annuity) (£)</label>
-<input type="number" id="pension" value="11500">
-<p>We calculate the portfolio draw required after guaranteed income.</p>
+<h2>Income Needs</h2>
+<input type="number" id="income" value="45000" placeholder="Required income (£)">
+<input type="number" id="pension" value="11500" placeholder="Guaranteed income (£)">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- STEP 5 -->
 <div id="step5" class="hidden">
 <div class="card">
-<h2>Step 3 — Phase Two (later life)</h2>
-<label>Later-life income requirement (£)</label>
-<input type="number" id="later" value="80000">
-<p>Later-life healthcare or residential support can significantly increase annual costs. We model this separately to test structural resilience.</p>
+<h2>Phase Two Income</h2>
+<input type="number" id="later" value="80000" placeholder="Later-life income (£)">
 <button onclick="next()">Next</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- STEP 6 -->
 <div id="step6" class="hidden">
 <div class="card">
-<h2>Step 4 — Assumptions</h2>
-<label>Expected return (%) (default 5%)</label>
-<input type="number" id="return" value="5">
-<label>Expected inflation (%) (typical 3–4%)</label>
-<input type="number" id="inflation" value="3">
-<p>This uses a simple net return assumption and inflates withdrawals annually. Designed to reveal structural withdrawal-rate pressure rather than predict markets.</p>
-<button onclick="runModel()">View Structural Diagnosis</button>
+<h2>Assumptions</h2>
+<input type="number" id="return" value="5" placeholder="Expected return (%)">
+<input type="number" id="inflation" value="3" placeholder="Expected inflation (%)">
+<button onclick="runModel()">View Diagnosis</button>
 <button class="secondary" onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- STEP 7 -->
 <div id="step7" class="hidden">
 <div class="card">
-<h2>Step 5 — Structural Diagnosis</h2>
+<h2>Structural Diagnosis</h2>
 <div id="output"></div>
 <canvas id="chart" width="320" height="200"></canvas>
-<button>Request Confidential Review</button>
+
+<h3>Request Confidential Review</h3>
+<form action="https://formspree.io/f/mojnewoq" method="POST">
+<input type="text" name="name" placeholder="Your Name" required>
+<input type="email" name="email" placeholder="Your Email" required>
+<textarea name="message" rows="4" placeholder="Briefly describe what you would like reviewed"></textarea>
+<button type="submit">Submit Request</button>
+</form>
+
 </div>
 </div>
 
 <div class="small">
-Illustrative modelling only. Not personal financial advice. Investment values can fall as well as rise.
+Illustrative modelling only. Not personal financial advice.
 </div>
 
 </body>
