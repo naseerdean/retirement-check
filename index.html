@@ -1,160 +1,107 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sterling Income Strategy</title>
 
 <style>
-:root{
- --bg1:#0b1320;
- --bg2:#162a4a;
- --card:rgba(255,255,255,.06);
- --stroke:rgba(255,255,255,.12);
- --text:#f3f6fb;
- --muted:rgba(243,246,251,.70);
- --gold1:#d4af37;
- --gold2:#f4d77a;
- --darkBtn:#223553;
- --ok:#1f3f2b;
- --warn:#6b4f1d;
- --bad:#5a1f2b;
-}
-
-*{box-sizing:border-box}
 body{
  margin:0;
  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
- color:var(--text);
- background: radial-gradient(circle at 20% 20%, var(--bg2), var(--bg1));
+ background:linear-gradient(135deg,#0b1320,#162a4a);
+ color:white;
 }
 .wrap{
- max-width:760px;
+ max-width:700px;
  margin:auto;
- padding:20px 16px 60px;
+ padding:20px;
 }
-.h1{
- font-family:Georgia,"Times New Roman",serif;
- font-size:36px;
- font-weight:500;
+h1{
+ font-family:Georgia,serif;
+ font-size:32px;
  background:linear-gradient(45deg,#d4af37,#f4d77a);
  -webkit-background-clip:text;
  -webkit-text-fill-color:transparent;
- margin:0 0 6px;
-}
-.sub{
- font-size:14px;
- color:var(--muted);
- margin:0 0 14px;
-}
-.progress{
- height:8px;
- background:rgba(255,255,255,.08);
- border-radius:999px;
- overflow:hidden;
-}
-.bar{
- height:100%;
- width:0%;
- background:linear-gradient(45deg,var(--gold1),var(--gold2));
- transition:.3s;
 }
 .card{
- background:var(--card);
- border-radius:18px;
+ background:rgba(255,255,255,0.06);
  padding:18px;
- margin-top:14px;
- border:1px solid var(--stroke);
- box-shadow:0 15px 50px rgba(0,0,0,.35);
+ border-radius:16px;
+ margin-top:15px;
 }
-.title{
- color:var(--gold2);
- margin-bottom:8px;
-}
-label{
- font-size:12px;
- font-weight:700;
- display:block;
- margin-top:10px;
-}
-input,select,textarea{
+input,select{
  width:100%;
  padding:12px;
- margin-top:6px;
- border-radius:12px;
- border:1px solid var(--stroke);
- background:#0f1d33;
- color:white;
-}
-textarea{min-height:80px;}
-button{
+ border-radius:10px;
  border:none;
- border-radius:12px;
+ margin-top:6px;
+ margin-bottom:12px;
+ font-size:16px;
+}
+button{
+ width:100%;
  padding:12px;
- font-weight:700;
+ border:none;
+ border-radius:10px;
+ font-weight:bold;
+ margin-top:10px;
  cursor:pointer;
- margin-top:12px;
 }
 .primary{
- background:linear-gradient(45deg,var(--gold1),var(--gold2));
+ background:linear-gradient(45deg,#d4af37,#f4d77a);
  color:black;
- width:100%;
 }
 .secondary{
- background:var(--darkBtn);
+ background:#223553;
  color:white;
- width:100%;
 }
+.hidden{display:none;}
 .kpis{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:10px;
- margin-top:12px;
 }
-@media(max-width:700px){
+@media(max-width:600px){
  .kpis{grid-template-columns:1fr;}
 }
 .kpi{
- background:rgba(255,255,255,.05);
+ background:rgba(255,255,255,0.05);
  padding:12px;
  border-radius:12px;
 }
-.k{font-size:12px;color:var(--muted);}
-.v{font-size:22px;font-weight:800;margin-top:4px;}
-.callout{
- margin-top:12px;
- padding:12px;
- border-radius:14px;
-}
-.hidden{display:none;}
-canvas{background:white;border-radius:12px;margin-top:14px;}
-.fine{
+.kpi b{
+ display:block;
  font-size:12px;
- color:var(--muted);
- text-align:center;
- margin-top:18px;
+ color:#ccc;
+}
+.kpi span{
+ font-size:20px;
+ font-weight:bold;
+}
+canvas{
+ background:white;
+ border-radius:12px;
+ margin-top:14px;
 }
 </style>
 </head>
 
 <body>
 <div class="wrap">
-<div class="h1">Sterling Income Strategy</div>
-<div class="sub">Structured sterling-only retirement income planning</div>
-<div class="progress"><div class="bar" id="bar"></div></div>
 
-<!-- STEP 1 -->
+<h1>Sterling Income Strategy</h1>
+
 <div class="card" id="step1">
-<div class="title">Why this matters</div>
-Retirement income is not just about yield. Inflation compounds. Care costs rise. Markets fluctuate.
-<button class="primary" onclick="go(2)">Begin Assessment</button>
+<b>Why this matters</b><br><br>
+Retirement income planning requires structure, not guesswork.
+<button class="primary" onclick="goStep(2)">Begin</button>
 </div>
 
-<!-- STEP 2 -->
 <div class="card hidden" id="step2">
-<div class="title">Your Details</div>
+<b>Your Inputs</b>
 
-<label>Total Capital (£)</label>
+<label>Capital (£)</label>
 <input id="capital" value="1000000">
 
 <label>Your Age</label>
@@ -172,7 +119,7 @@ Retirement income is not just about yield. Inflation compounds. Care costs rise.
 <label>Years Until Phase Two</label>
 <input id="phase1y" value="8">
 
-<label>Return Assumption (%)</label>
+<label>Return (%)</label>
 <input id="ret" value="5">
 
 <label>Inflation (%)</label>
@@ -185,138 +132,116 @@ Retirement income is not just about yield. Inflation compounds. Care costs rise.
 <option value="higher">Income First</option>
 </select>
 
-<button class="primary" onclick="build()">View Recommendation</button>
-<button class="secondary" onclick="go(1)">Back</button>
+<button class="primary" onclick="buildModel()">View Recommendation</button>
+<button class="secondary" onclick="goStep(1)">Back</button>
 </div>
 
-<!-- STEP 3 -->
 <div class="card hidden" id="step3">
-<div class="title">Your Recommended Model</div>
+<b>Your Recommendation</b>
 
 <div class="kpis">
-<div class="kpi"><div class="k">Model</div><div class="v" id="modelOut"></div></div>
-<div class="kpi"><div class="k">Net Yield (after 0.25%)</div><div class="v" id="yieldOut"></div></div>
-<div class="kpi"><div class="k">Net Income</div><div class="v" id="incomeOut"></div></div>
-<div class="kpi"><div class="k">Age Funds May Deplete</div><div class="v" id="depleteOut"></div></div>
+<div class="kpi"><b>Model</b><span id="modelOut"></span></div>
+<div class="kpi"><b>Net Yield</b><span id="yieldOut"></span></div>
+<div class="kpi"><b>Net Income</b><span id="incomeOut"></span></div>
+<div class="kpi"><b>Age Depletion</b><span id="depleteOut"></span></div>
 </div>
 
-<div id="callout" class="callout"></div>
+<div id="warning" style="margin-top:10px;"></div>
 
-<canvas id="pie" height="280"></canvas>
-<canvas id="line" height="300"></canvas>
+<canvas id="chart" width="600" height="300"></canvas>
 
-<hr style="border:1px solid rgba(255,255,255,.1);margin:16px 0;">
-
-<div class="title">Compare Models</div>
-Proposal A Net Yield: 4.83%<br>
-Proposal B Net Yield: 5.76%
-
-<button class="primary" onclick="go(4)">Accept Proposal</button>
-<button class="secondary" onclick="go(2)">Edit Inputs</button>
-<button class="secondary" onclick="window.print()">Download PDF</button>
-
-<div class="fine">
-Illustrative only. Not financial advice. Capital at risk.
-</div>
+<button class="primary" onclick="goStep(4)">Accept</button>
+<button class="secondary" onclick="goStep(2)">Edit</button>
 </div>
 
-<!-- STEP 4 -->
 <div class="card hidden" id="step4">
-<div class="title">Confirm & Request Implementation</div>
+<b>Confirm</b>
 
 <form action="https://formspree.io/f/mojnewoq" method="POST">
 <input name="name" placeholder="Your Name" required>
 <input name="email" type="email" placeholder="Your Email" required>
-<input type="hidden" name="selectedProposal" id="selectedProposal">
+<input type="hidden" name="proposal" id="proposalHidden">
 <button class="primary" type="submit">Submit</button>
 </form>
 
-<button class="secondary" onclick="go(3)">Back</button>
+<button class="secondary" onclick="goStep(3)">Back</button>
 </div>
 
 </div>
 
 <script>
-const fee=0.25;
 
-const A={name:"Proposal A",yield:5.08};
-const B={name:"Proposal B",yield:6.01};
+const fee = 0.25;
+const proposalA = {name:"Proposal A", yield:5.08};
+const proposalB = {name:"Proposal B", yield:6.01};
 
-function go(n){
-["step1","step2","step3","step4"].forEach((id,i)=>
-document.getElementById(id).classList.toggle("hidden",i!==n-1));
-document.getElementById("bar").style.width=(n*25)+"%";
+function goStep(step){
+["step1","step2","step3","step4"].forEach((id,i)=>{
+ document.getElementById(id).classList.toggle("hidden", i !== step-1);
+});
 }
 
-function build(){
-let cap=+capital.value;
-let age=+age.value;
-let inc1=+inc1.value;
-let inc2=+inc2.value;
-let guar=+guar.value;
-let years=+phase1y.value;
-let ret=+ret.value/100;
-let inf=+inf.value/100;
-let risk=risk.value;
+function buildModel(){
 
-let model=(risk==="higher")?B:A;
+let cap = Number(document.getElementById("capital").value);
+let ageVal = Number(document.getElementById("age").value);
+let inc1 = Number(document.getElementById("inc1").value);
+let guar = Number(document.getElementById("guar").value);
+let inc2 = Number(document.getElementById("inc2").value);
+let phaseYears = Number(document.getElementById("phase1y").value);
+let ret = Number(document.getElementById("ret").value)/100;
+let inf = Number(document.getElementById("inf").value)/100;
+let risk = document.getElementById("risk").value;
 
-let netYield=model.yield-fee;
-let netIncome=cap*netYield/100;
+let model = (risk==="higher") ? proposalB : proposalA;
 
-modelOut.innerText=model.name;
-yieldOut.innerText=netYield.toFixed(2)+"%";
-incomeOut.innerText="£"+Math.round(netIncome).toLocaleString();
+let netYield = model.yield - fee;
+let netIncome = cap * netYield / 100;
 
-selectedProposal.value=model.name;
+document.getElementById("modelOut").innerText = model.name;
+document.getElementById("yieldOut").innerText = netYield.toFixed(2)+"%";
+document.getElementById("incomeOut").innerText = "£"+Math.round(netIncome).toLocaleString();
+document.getElementById("proposalHidden").value = model.name;
 
-// stress test
-let bal=cap;
-let draw1=inc1-guar;
-let draw2=inc2-guar;
-let depletion=null;
+// Projection
+let bal = cap;
+let depletionAge = "40+ yrs";
 
-for(let y=0;y<40;y++){
-let draw=(y<years?draw1:draw2)*Math.pow(1+inf,y);
-bal=bal*(1+ret)-draw;
-if(bal<=0){depletion=age+y;break;}
+for(let y=0; y<40; y++){
+ let draw = (y<phaseYears ? inc1-guar : inc2-guar);
+ draw = draw * Math.pow(1+inf,y);
+ bal = bal*(1+ret) - draw;
+ if(bal<=0){
+  depletionAge = ageVal + y;
+  break;
+ }
 }
-depleteOut.innerText=depletion?depletion:"40+ yrs";
 
-if(depletion){
-callout.style.background="#5a1f2b";
-callout.innerHTML="<b>⚠ Plan may fail under stress.</b>";
+document.getElementById("depleteOut").innerText = depletionAge;
+
+if(depletionAge !== "40+ yrs"){
+ document.getElementById("warning").innerHTML =
+ "<div style='background:#5a1f2b;padding:10px;border-radius:8px;'>⚠ Plan may deplete under assumptions.</div>";
 }else{
-callout.style.background="#1f3f2b";
-callout.innerHTML="<b>Structure appears sustainable under assumptions.</b>";
+ document.getElementById("warning").innerHTML =
+ "<div style='background:#1f3f2b;padding:10px;border-radius:8px;'>✓ Appears sustainable under assumptions.</div>";
 }
 
-drawPie();
-drawLine(cap,ret);
-
-go(3);
-}
-
-function drawPie(){
-let ctx=pie.getContext("2d");
-ctx.clearRect(0,0,pie.width,pie.height);
-ctx.fillStyle="#d4af37";
+// Chart
+let ctx = document.getElementById("chart").getContext("2d");
+ctx.clearRect(0,0,600,300);
 ctx.beginPath();
-ctx.arc(150,150,100,0,2*Math.PI);
-ctx.fill();
-}
-
-function drawLine(cap,ret){
-let ctx=line.getContext("2d");
-ctx.clearRect(0,0,line.width,line.height);
-ctx.beginPath();
-ctx.moveTo(20,200);
-ctx.lineTo(400,100);
+ctx.moveTo(20,250);
+ctx.lineTo(580,80);
 ctx.strokeStyle="#d4af37";
+ctx.lineWidth=3;
 ctx.stroke();
+
+goStep(3);
 }
 
-go(1);
+goStep(1);
+
 </script>
 
 </body>
