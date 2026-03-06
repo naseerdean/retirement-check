@@ -1,257 +1,1118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Advanced Retirement Drawdown & Stress Test</title>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
-    <style>
-        :root {
-            --royal: #1C3F7A; --royal-dk: #142D5A; --royal-lt: #3A6CC8; --royal-bg: rgba(28,63,122,0.06);
-            --forest: #1A5C3A; --forest-bg: rgba(26,92,58,0.06);
-            --err: #B91C1C; --err-bg: #FEF2F2; --warn: #B45309;
-            --ink: #1E2530; --ink3: #4A5568; --ink4: #6B7A90;
-            --border: #D8DDE6; --bg: #F4F6F9; --white: #FFFFFF;
-            --r2: 10px; --shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); font-family: 'Source Sans 3', sans-serif; color: var(--ink); font-size: 14px; line-height: 1.5; }
-        .hdr { background: var(--royal-dk); color: white; padding: 15px 30px; border-bottom: 3px solid var(--royal-lt); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .main { max-width: 1400px; margin: 20px auto; display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 0 20px; }
-        .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--r2); margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .panel-hd { padding: 12px 16px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-family: 'Libre Baskerville', serif; font-weight: 700; font-size: 14px; color: var(--royal); }
-        .panel-bd { padding: 16px; }
-        .src-box { padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px; border-left: 4px solid var(--royal); }
-        .fld { margin-bottom: 10px; }
-        .fld label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink4); margin-bottom: 4px; }
-        .wrap { position: relative; }
-        .wrap span { position: absolute; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink4); pointer-events: none; }
-        .wrap .pre { left: 10px; } .wrap .suf { right: 10px; }
-        input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Source Code Pro', monospace; font-size: 13px; background: #fdfdfd; }
-        .pre input { padding-left: 22px; } .suf input { padding-right: 25px; }
-        .btn { width: 100%; padding: 12px; background: var(--royal); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        .btn:hover { background: var(--royal-lt); transform: translateY(-1px); }
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .kpi-card { background: white; padding: 15px; border-radius: var(--r2); border-top: 4px solid var(--royal); box-shadow: var(--shadow); }
-        .kpi-val { font-family: 'Source Code Pro', monospace; font-size: 22px; font-weight: 600; margin: 5px 0; }
-        .chart-container { height: 300px; width: 100%; position: relative; margin-top: 10px; }
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-start; }
-        .alert-err { background: var(--err-bg); border: 1px solid #fecaca; color: var(--err); }
-        canvas { width: 100% !important; height: 100% !important; }
-        .footer { text-align: center; padding: 20px; font-size: 11px; color: var(--ink4); }
-        @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Retirement Planning Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --royal:#1C3F7A;--royal-dk:#142D5A;--royal-md:#2A52A0;--royal-lt:#3A6CC8;
+  --royal-bg:rgba(28,63,122,0.06);--royal-bdr:rgba(28,63,122,0.18);
+  --forest:#1A5C3A;--forest-bg:rgba(26,92,58,0.06);--forest-bdr:rgba(26,92,58,0.18);
+  --fern:#2E7D52;--fern-bg:rgba(46,125,82,0.06);--fern-bdr:rgba(46,125,82,0.18);
+  --sage:#4A7C6F;--sage-bg:rgba(74,124,111,0.06);--sage-bdr:rgba(74,124,111,0.18);
+  --steel:#2C5F8A;--steel-bg:rgba(44,95,138,0.06);--steel-bdr:rgba(44,95,138,0.18);
+  --slate:#3D6480;--slate-bg:rgba(61,100,128,0.06);--slate-bdr:rgba(61,100,128,0.18);
+  --amber:#92600A;--amber-bg:rgba(146,96,10,0.06);--amber-bdr:rgba(146,96,10,0.2);
+  --plum:#5C3A7A;--plum-bg:rgba(92,58,122,0.06);--plum-bdr:rgba(92,58,122,0.18);
+  --ink:#1E2530;--ink2:#2E3645;--ink3:#4A5568;--ink4:#6B7A90;
+  --border:#D8DDE6;--border2:#C4CBD8;
+  --bg:#F4F6F9;--bg2:#EDF0F5;--bg3:#E2E7EF;--white:#FFFFFF;
+  --err:#B91C1C;--err-bg:rgba(185,28,28,0.05);--warn:#B45309;--ok:#166534;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05),0 2px 8px rgba(0,0,0,0.04);
+  --r:6px;--r2:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'Source Sans 3',sans-serif;color:var(--ink);min-height:100vh;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.hdr{background:var(--royal-dk);border-bottom:3px solid var(--royal-lt);padding:11px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,0.2);gap:10px;flex-wrap:wrap}
+.hdr-title{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#fff}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,0.42);letter-spacing:.07em;text-transform:uppercase;margin-top:1px}
+.hdr-tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{padding:3px 9px;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.04em;border:1px solid;text-transform:uppercase}
+.tab-nav{background:var(--royal-dk);border-bottom:1px solid rgba(255,255,255,0.1);padding:0 24px;display:flex;gap:0;overflow-x:auto}
+.tab-btn{padding:10px 18px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-family:'Source Sans 3',sans-serif;letter-spacing:.03em;transition:all .15s}
+.tab-btn:hover{color:rgba(255,255,255,0.8)}
+.tab-btn.active{color:#fff;border-bottom-color:var(--royal-lt)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.main{max-width:1560px;margin:0 auto;padding:16px 18px;display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
+.main-full{max-width:1560px;margin:0 auto;padding:16px 18px}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow-sm);margin-bottom:10px;overflow:hidden}
+.panel-hd{padding:10px 14px;border-bottom:1px solid var(--border);background:linear-gradient(to right,var(--bg),var(--bg2));display:flex;align-items:center;gap:7px}
+.panel-hd-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--royal-bg)}
+.panel-hd-title{font-family:'Libre Baskerville',serif;font-size:12.5px;font-weight:700;color:var(--royal)}
+.panel-bd{padding:14px}
+.src{border-radius:var(--r);padding:11px;margin-bottom:7px;border:1px solid;border-left-width:3px}
+.src-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.src-desc{font-size:10.5px;margin-bottom:8px;color:var(--ink4);font-style:italic}
+.fld{margin-bottom:7px}
+.fld label{display:block;font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:2px}
+.fld .wrap{position:relative}
+.fld .pre{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--ink4);pointer-events:none;z-index:1;font-weight:500}
+.fld .suf{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10.5px;color:var(--ink4);pointer-events:none;font-weight:500}
+input[type=number],input[type=text],select{width:100%;padding:6px 9px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--ink);font-size:12px;font-family:'Source Code Pro',monospace;outline:none;transition:border-color .12s,box-shadow .12s,background .12s}
+input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--royal-md);box-shadow:0 0 0 3px rgba(42,82,160,.1);background:var(--white)}
+input[type=number]::-webkit-inner-spin-button{opacity:.25}
+select{font-family:'Source Sans 3',sans-serif;font-size:12px}
+.fld.pre input{padding-left:20px}
+.fld.suf input{padding-right:26px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--royal);margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--royal-bdr)}
+.btn{width:100%;padding:10px 14px;background:var(--royal);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;font-family:'Source Sans 3',sans-serif;letter-spacing:.03em;transition:background .13s,box-shadow .13s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn:hover{background:var(--royal-md);box-shadow:0 2px 8px rgba(28,63,122,.25)}
+.btn:active{background:var(--royal-dk)}
+.btn-sm{padding:6px 12px;font-size:11.5px;width:auto;margin-top:0}
+.btn-outline{background:transparent;border:1.5px solid var(--royal);color:var(--royal)}
+.btn-outline:hover{background:var(--royal-bg)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;box-shadow:var(--shadow-sm);border-top:3px solid}
+.kpi-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+.kpi-v{font-family:'Source Code Pro',monospace;font-size:18px;font-weight:500;line-height:1;margin-bottom:2px}
+.kpi-note{font-size:10px;color:var(--ink4)}
+.banner{border-radius:var(--r2);padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;border:1px solid;border-left:3px solid}
+.banner-title{font-family:'Libre Baskerville',serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.banner-body{font-size:12px;line-height:1.7;color:var(--ink2)}
+.rpanel{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow-sm);margin-bottom:10px;overflow:hidden}
+.rpanel-hd{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.rpanel-title{font-family:'Libre Baskerville',serif;font-size:12.5px;font-weight:700;color:var(--ink)}
+.rpanel-bd{padding:12px 14px}
+.tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{background:var(--royal-dk);color:rgba(255,255,255,.8);padding:7px 9px;text-align:right;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;white-space:nowrap;font-family:'Source Sans 3',sans-serif}
+th.L{text-align:left}
+td{padding:6px 9px;text-align:right;border-bottom:1px solid var(--bg3);font-family:'Source Code Pro',monospace;font-size:11px;color:var(--ink3)}
+td.L{text-align:left;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:12px;color:var(--ink)}
+tr:nth-child(even) td{background:rgba(244,246,249,.5)}
+tr:hover td{background:rgba(28,63,122,.03)}
+.depl-row td{background:rgba(185,28,28,.04)!important}
+.shock-row td{background:rgba(146,96,10,.05)!important}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:'Source Sans 3',sans-serif}
+.leg{display:flex;gap:12px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink3);font-weight:500}
+.leg-dot{width:9px;height:9px;border-radius:2px}
+.insight{background:var(--royal-bg);border:1px solid var(--royal-bdr);border-left:3px solid var(--royal);border-radius:var(--r2);padding:12px 14px;display:flex;gap:9px;margin-bottom:4px}
+.insight-body{font-size:12px;color:var(--ink2);line-height:1.75}
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.scenario-card{border-radius:var(--r2);padding:14px;border:1.5px solid}
+.scenario-title{font-family:'Libre Baskerville',serif;font-size:12px;font-weight:700;margin-bottom:8px}
+.scenario-stat{margin-bottom:5px}
+.scenario-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4)}
+.scenario-stat-val{font-family:'Source Code Pro',monospace;font-size:15px;font-weight:500}
+.mc-bar-bg{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.mc-bar-fill{height:100%;border-radius:5px;transition:width .4s ease}
+.shock-row-input{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.shock-del{width:22px;height:22px;background:var(--err-bg);border:1px solid rgba(185,28,28,.2);border-radius:4px;color:var(--err);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iht-meter{height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin:6px 0}
+.iht-meter-fill{height:100%;background:linear-gradient(to right,var(--forest),var(--amber),var(--err));border-radius:6px;transition:width .4s}
+.band-note{font-size:10px;color:var(--ink4);font-style:italic;margin-top:4px}
+.empty{padding:48px 32px;text-align:center}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.22}
+.empty-title{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.empty-body{font-size:12.5px;color:var(--ink3);line-height:1.85;max-width:420px;margin:0 auto}
+.footer{text-align:center;padding:12px;font-size:10px;color:var(--ink4);border-top:1px solid var(--border);margin-top:4px;letter-spacing:.02em;background:var(--white)}
+.taxband-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11.5px}
+.taxband-bar{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.taxband-fill{height:100%;border-radius:4px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.toggle-lbl{font-size:11.5px;color:var(--ink3);font-weight:500}
+.toggle{width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .15s;flex-shrink:0}
+.toggle.on{background:var(--royal)}
+.toggle::after{content:'';width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:16px}
+@media(max-width:900px){.main{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr}.kpi-grid,.kpi-grid-5{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 
 <header class="hdr">
-    <div>
-        <h1 style="font-family:'Libre Baskerville'; font-size:18px;">Retirement Stress Test Pro</h1>
-        <p style="font-size:10px; opacity:0.7; letter-spacing:1px; text-transform:uppercase;">Sequence of Returns & Tax-Trap Analysis</p>
-    </div>
+  <div>
+    <div class="hdr-title">Retirement Planning Suite</div>
+    <div class="hdr-sub">Drawdown · Stress Testing · Monte Carlo · IHT · Tax Optimisation — Illustrative Example Only</div>
+  </div>
+  <div class="hdr-tags">
+    <span class="tag" style="color:#8C9BB5;border-color:rgba(140,155,181,.4);background:rgba(140,155,181,.08)">Base Case</span>
+    <span class="tag" style="color:#B91C1C;border-color:rgba(185,28,28,.4);background:rgba(185,28,28,.08)">Market Shock</span>
+    <span class="tag" style="color:#92600A;border-color:rgba(146,96,10,.4);background:rgba(146,96,10,.1)">Inflation Stress</span>
+    <span class="tag" style="color:#fff;border-color:rgba(58,108,200,.6);background:rgba(58,108,200,.25)">Monte Carlo</span>
+  </div>
 </header>
 
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('drawdown',this)">&#128202; Drawdown Planner</button>
+  <button class="tab-btn" onclick="switchTab('shock',this)">&#9889; Market Shocks</button>
+  <button class="tab-btn" onclick="switchTab('stress',this)">&#127777; Stress Testing</button>
+  <button class="tab-btn" onclick="switchTab('monte',this)">&#127922; Monte Carlo</button>
+  <button class="tab-btn" onclick="switchTab('iht',this)">&#127963; IHT &amp; Estate</button>
+  <button class="tab-btn" onclick="switchTab('tax',this)">&#9878; Tax Optimiser</button>
+</nav>
+
+<div id="tab-drawdown" class="tab-content active">
 <div class="main">
-    <aside>
-        <div class="panel">
-            <div class="panel-hd">💰 Capital Assets</div>
-            <div class="panel-bd">
-                <div class="src-box">
-                    <div class="fld pre"><label>Pension Fund</label><div class="wrap"><span class="pre">£</span><input type="number" id="pension" value="500000"></div></div>
-                    <div class="fld suf"><label>Annual Growth</label><div class="wrap"><input type="number" id="pg" value="5" step="0.1"><span class="suf">%</span></div></div>
-                </div>
-                <div class="src-box" style="border-left-color: var(--forest)">
-                    <div class="fld pre"><label>ISA / Tax-Free</label><div class="wrap"><span class="pre">£</span><input type="number" id="isa" value="100000"></div></div>
-                    <div class="fld pre"><label>Cash Buffer</label><div class="wrap"><span class="pre">£</span><input type="number" id="cash" value="30000"></div></div>
-                </div>
-                <div class="fld suf"><label>Platform Fees</label><div class="wrap"><input type="number" id="fees" value="0.5" step="0.1"><span class="suf">%</span></div></div>
-            </div>
+  <div>
+    <div class="panel">
+      <div class="panel-hd"><div class="panel-hd-icon">&#128188;</div><span class="panel-hd-title">Capital Sources</span></div>
+      <div class="panel-bd">
+        <div class="src" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">
+          <div class="src-label" style="color:var(--royal)">Pension (SIPP)</div>
+          <div class="src-desc">Withdrawals taxed as earned income</div>
+          <div class="fld pre"><label>Fund Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pension" value="400000" step="10000"></div></div>
+          <div class="fld pre"><label>PCLS (Tax-Free Cash)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pcls" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="pg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
         </div>
+        <div class="src" style="background:var(--plum-bg);border-color:var(--plum-bdr);border-left-color:var(--plum)">
+          <div class="src-label" style="color:var(--plum)">DB Pension</div>
+          <div class="src-desc">Defined benefit — fixed income with escalation</div>
+          <div class="fld pre"><label>Annual DB Income</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="dbAmt" value="8000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="dbAge" value="65" step="1"></div></div>
+            <div class="fld suf"><label>Escalation</label><div class="wrap"><input type="number" id="dbIdx" value="2.5" step="0.1"><span class="suf">%</span></div></div>
+          </div>
+          <div class="fld suf"><label>Spouse Fraction on Death</label><div class="wrap"><input type="number" id="dbSpouse" value="50" step="5" min="0" max="100"><span class="suf">%</span></div></div>
+        </div>
+        <div class="src" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">
+          <div class="src-label" style="color:var(--forest)">ISA</div>
+          <div class="src-desc">All withdrawals completely tax free</div>
+          <div class="fld pre"><label>Balance</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="isa" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="ig" value="5.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+        <div class="src" style="background:var(--sage-bg);border-color:var(--sage-bdr);border-left-color:var(--sage)">
+          <div class="src-label" style="color:var(--sage)">GIA</div>
+          <div class="src-desc">CGT on gains. Dividend income taxed separately.</div>
+          <div class="fld pre"><label>Balance</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="gia" value="50000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="gg" value="4.5" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld pre"><label>Annual Dividends (gross)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="divAmt" value="2000" step="100"></div></div>
+          <div class="fld suf"><label>Dividend Growth Rate</label><div class="wrap"><input type="number" id="divGrowth" value="3.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+        <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">Offshore Bond</div>
+          <div class="src-desc">5% p.a. tax-deferred allowance</div>
+          <div class="fld pre"><label>Surrender Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ob" value="150000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="obg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Exempt Years Remaining</label><div class="wrap"><input type="number" id="obYrs" value="20" step="1" min="0" max="20"><span class="suf">yrs</span></div></div>
+        </div>
+        <div class="fld suf"><label>Annual Fees (all wrappers)</label><div class="wrap"><input type="number" id="fees" value="0.5" step="0.05"><span class="suf">%</span></div></div>
+      </div>
+    </div>
 
-        <div class="panel">
-            <div class="panel-hd">📉 Market Stress Test</div>
-            <div class="panel-bd">
-                <div class="fld suf"><label>Market Crash (Shock)</label><div class="wrap"><input type="number" id="shockMag" value="20" style="color:var(--err)"><span class="suf">-%</span></div></div>
-                <div class="fld"><label>Age of Shock</label><input type="number" id="shockAge" value="67"></div>
-                <p style="font-size:10px; color:var(--ink4); font-style:italic;">Simulates Sequence of Returns Risk</p>
-            </div>
+    <div class="panel">
+      <div class="panel-hd"><div class="panel-hd-icon">&#128200;</div><span class="panel-hd-title">Guaranteed Income</span></div>
+      <div class="panel-bd">
+        <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">State Pension</div>
+          <div class="src-desc">Triple lock indexed</div>
+          <div class="fld pre"><label>Annual (gross)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="spAmt" value="11500" step="100"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="spAge" value="67" step="1"></div></div>
+            <div class="fld suf"><label>Index %</label><div class="wrap"><input type="number" id="spIdx" value="3.5" step="0.1"><span class="suf">%</span></div></div>
+          </div>
         </div>
+        <div class="src" style="background:var(--amber-bg);border-color:var(--amber-bdr);border-left-color:var(--amber)">
+          <div class="src-label" style="color:var(--amber)">Annuity</div>
+          <div class="src-desc">Purchase from pension at chosen age</div>
+          <div class="toggle-row"><span class="toggle-lbl">Include annuity purchase</span><div class="toggle" id="annuityToggle" onclick="toggleAnnuity()"></div></div>
+          <div id="annuityFields" style="display:none">
+            <div class="fld"><label>Purchase Age</label><div class="wrap"><input type="number" id="annuityAge" value="75" step="1"></div></div>
+            <div class="fld pre"><label>Amount from Pension</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="annuityPot" value="100000" step="5000"></div></div>
+            <div class="fld suf"><label>Annuity Rate</label><div class="wrap"><input type="number" id="annuityRate" value="5.5" step="0.1"><span class="suf">%</span></div></div>
+          </div>
+        </div>
+        <div class="src" style="background:var(--fern-bg);border-color:var(--fern-bdr);border-left-color:var(--fern)">
+          <div class="src-label" style="color:var(--fern)">Rental Income</div>
+          <div class="src-desc">Net after costs</div>
+          <div class="fld pre"><label>Annual Net</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="rental" value="12000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>From Age</label><div class="wrap"><input type="number" id="rentalAge" value="65" step="1"></div></div>
+            <div class="fld"><label>To Age (0=always)</label><div class="wrap"><input type="number" id="rentalEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Increase</label><div class="wrap"><input type="number" id="rentalIdx" value="3.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+        <div class="src" style="background:var(--slate-bg);border-color:var(--slate-bdr);border-left-color:var(--slate)">
+          <div class="src-label" style="color:var(--slate)">Trust / Other</div>
+          <div class="fld pre"><label>Annual Net</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="trust" value="5000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>From Age</label><div class="wrap"><input type="number" id="trustAge" value="65" step="1"></div></div>
+            <div class="fld"><label>To Age (0=always)</label><div class="wrap"><input type="number" id="trustEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Increase</label><div class="wrap"><input type="number" id="trustIdx" value="2.5" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+      </div>
+    </div>
 
-        <div class="panel">
-            <div class="panel-hd">📅 Timeline & Spending</div>
-            <div class="panel-bd">
-                <div style="display:flex; gap:10px">
-                    <div class="fld"><label>Start Age</label><input type="number" id="sa" value="65"></div>
-                    <div class="fld"><label>Years</label><input type="number" id="ty" value="35"></div>
-                </div>
-                <div class="fld pre"><label>Target Annual Net Spend</label><div class="wrap"><span class="pre">£</span><input type="number" id="sp1" value="35000"></div></div>
-                <div class="fld suf"><label>Inflation</label><div class="wrap"><input type="number" id="inf" value="2.5"><span class="suf">%</span></div></div>
-                
-                <div class="src-box" style="border-left-color: var(--warn); background: #fffcf0;">
-                    <div class="fld pre"><label>Lumpy Expense (e.g. Car)</label><div class="wrap"><span class="pre">£</span><input type="number" id="lumpAmt" value="0"></div></div>
-                    <div class="fld"><label>At Age</label><input type="number" id="lumpAge" value="75"></div>
-                </div>
-                
-                <button class="btn" onclick="calculate()">Run Sophisticated Model</button>
-            </div>
+    <div class="panel">
+      <div class="panel-hd"><div class="panel-hd-icon">&#9881;&#65039;</div><span class="panel-hd-title">Spending &amp; Tax</span></div>
+      <div class="panel-bd">
+        <div class="sl">Timeline</div>
+        <div class="fr">
+          <div class="fld"><label>Start Age</label><div class="wrap"><input type="number" id="sa" value="65" step="1"></div></div>
+          <div class="fld"><label>Model Years</label><div class="wrap"><input type="number" id="ty" value="35" step="1"></div></div>
         </div>
-    </aside>
-
-    <main id="results-area">
-        <div class="panel" style="padding:40px; text-align:center; color:var(--ink4);">
-            <h2>Ready for Analysis</h2>
-            <p>Adjust your market shock settings and click Run to see the impact of volatility and taxes on your wealth.</p>
+        <div class="fld"><label>Phase 2 Care Start Age</label><div class="wrap"><input type="number" id="ca" value="80" step="1"></div></div>
+        <div class="sl">Net Spending Target (today's &#163;)</div>
+        <div class="fr">
+          <div class="fld pre"><label>Phase 1</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="sp1" value="40000" step="500"></div></div>
+          <div class="fld pre"><label>Phase 2 Care</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="sp2" value="80000" step="500"></div></div>
         </div>
-    </main>
+        <div class="sl">Tax Rates</div>
+        <div class="fr">
+          <div class="fld suf"><label>Income Tax P1</label><div class="wrap"><input type="number" id="t1" value="20" step="1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Income Tax P2</label><div class="wrap"><input type="number" id="t2" value="20" step="1"><span class="suf">%</span></div></div>
+        </div>
+        <div class="fr">
+          <div class="fld suf"><label>CGT Rate</label><div class="wrap"><input type="number" id="cg" value="18" step="1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Dividend Tax</label><div class="wrap"><input type="number" id="divTax" value="8.75" step="0.25"><span class="suf">%</span></div></div>
+        </div>
+        <div class="sl">Inflation</div>
+        <div class="fr">
+          <div class="fld suf"><label>Phase 1</label><div class="wrap"><input type="number" id="i1" value="2.5" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Phase 2</label><div class="wrap"><input type="number" id="i2" value="4.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+        <button class="btn" onclick="runAll()"><span>Run Full Analysis</span><span style="font-size:15px">&#8594;</span></button>
+      </div>
+    </div>
+  </div>
+  <div id="results">
+    <div class="rpanel"><div class="empty"><div class="empty-icon">&#9878;</div><div class="empty-title">Retirement Planning Suite</div><div class="empty-body">Configure all inputs on the left then click <strong>Run Full Analysis</strong>. Results populate all six tabs simultaneously.</div></div></div>
+  </div>
+</div>
 </div>
 
-<footer class="footer">
-    Illustrative purposes only. Includes Personal Allowance Taper logic (£100k+). Not financial advice.
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function g(id){ return parseFloat(document.getElementById(id).value) || 0; }
-function f(v){ return '£' + Math.round(v).toLocaleString('en-GB'); }
-
-function calculate() {
-    const p = {
-        pension: g('pension'), isa: g('isa'), cash: g('cash'),
-        pg: g('pg'), fees: g('fees'), shockMag: g('shockMag'), shockAge: g('shockAge'),
-        sa: g('sa'), ty: g('ty'), sp1: g('sp1'), inf: g('inf'),
-        lumpAmt: g('lumpAmt'), lumpAge: g('lumpAge')
-    };
-
-    let pB = p.pension, iB = p.isa, cB = p.cash;
-    let totTax = 0, depAge = null, trapDetected = false;
-    let rows = [];
-
-    const growth = (p.pg - p.fees) / 100;
-
-    for (let yr = 1; yr <= p.ty; yr++) {
-        let age = p.sa + yr - 1;
-        let target = p.sp1 * Math.pow(1 + p.inf/100, yr - 1);
-        if (age === p.lumpAge) target += p.lumpAmt;
-
-        // 1. Calculate Tax Trap (PA Taper)
-        // For simplicity in this demo, we assume Pension is the only taxable income source
-        let taxableIncomeNeeded = target; 
-        let effectivePA = 12570;
-        if (taxableIncomeNeeded > 100000) {
-            effectivePA = Math.max(0, 12570 - (taxableIncomeNeeded - 100000) / 2);
-            trapDetected = true;
-        }
-
-        // 2. Market Shock Logic
-        let yrGrowth = (age === p.shockAge) ? -(p.shockMag / 100) : growth;
-
-        // 3. Drawdown Strategy (Waterfall)
-        let drawP = 0, drawI = 0, drawC = 0, tax = 0;
-        let remaining = target;
-
-        // Rule: If market is crashing, use Cash/ISA first to avoid selling low (SORR Protection)
-        if (age === p.shockAge || yrGrowth < 0) {
-            drawC = Math.min(cB, remaining); remaining -= drawC;
-            drawI = Math.min(iB, remaining); remaining -= drawI;
-        }
-
-        // Rule: Use Pension up to Personal Allowance (Tax Free)
-        let freeP = Math.min(pB, effectivePA, remaining);
-        drawP += freeP; remaining -= freeP;
-
-        // Rule: Taxable Pension
-        if (remaining > 0 && pB > drawP) {
-            let taxableDraw = Math.min(pB - drawP, remaining / 0.8); // Assumes basic rate 20%
-            tax = taxableDraw * 0.2;
-            drawP += taxableDraw;
-            remaining -= (taxableDraw - tax);
-        }
-
-        // Rule: Final Gap from ISA
-        if (remaining > 0) {
-            let gap = Math.min(iB - drawI, remaining);
-            drawI += gap; remaining -= gap;
-        }
-
-        // Update Balances
-        pB = Math.max(0, pB - drawP) * (1 + yrGrowth);
-        iB = Math.max(0, iB - drawI) * (1 + yrGrowth);
-        cB = Math.max(0, cB - drawC); // Cash doesn't grow in this model
-
-        totTax += tax;
-        let total = pB + iB + cB;
-        if (total <= 0 && !depAge) depAge = age;
-
-        rows.push({ age, total, drawP, drawI, drawC, tax });
-    }
-
-    renderResults(rows, totTax, depAge, trapDetected, p);
-}
-
-function renderResults(rows, totTax, depAge, trap, p) {
-    const area = document.getElementById('results-area');
-    let html = '';
-
-    if (trap) {
-        html += `<div class="alert alert-err">
-            <div style="font-size:20px">⚠️</div>
-            <div><strong>Tax Trap Detected!</strong> Your drawdown exceeds £100,000 in some years, triggering the Personal Allowance Taper (60% effective tax). Consider using more ISA capital in those years.</div>
-        </div>`;
-    }
-
-    html += `
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div style="font-size:10px; color:var(--ink4); text-transform:uppercase;">Final Wealth</div>
-            <div class="kpi-val" style="color:${rows[rows.length-1].total > 0 ? 'var(--forest)' : 'var(--err)'}">${f(rows[rows.length-1].total)}</div>
-        </div>
-        <div class="kpi-card">
-            <div style="font-size:10px; color:var(--ink4); text-transform:uppercase;">Total Tax Paid</div>
-            <div class="kpi-val" style="color:var(--err)">${f(totTax)}</div>
-        </div>
-        <div class="kpi-card">
-            <div style="font-size:10px; color:var(--ink4); text-transform:uppercase;">Fund Depleted</div>
-            <div class="kpi-val">${depAge ? 'Age ' + depAge : 'Never'}</div>
-        </div>
-    </div>
-    
-    <div class="panel">
-        <div class="panel-hd">Portfolio Longevity (After ${p.shockMag}% Shock)</div>
+<div id="tab-shock" class="tab-content">
+<div class="main-full">
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-hd-icon">&#9889;</div><span class="panel-hd-title">Market Shock Scenarios</span></div>
         <div class="panel-bd">
-            <div class="chart-container"><canvas id="mainChart"></canvas></div>
+          <p style="font-size:11.5px;color:var(--ink3);margin-bottom:12px;line-height:1.7">Define up to 4 market shocks. Each applies a one-off fall to all capital wrappers in the specified year, then resumes normal growth.</p>
+          <div id="shockList"></div>
+          <button class="btn btn-outline btn-sm" onclick="addShock()" style="margin-top:6px;width:100%">+ Add Shock Event</button>
+          <div class="sl">Preset Scenarios</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="loadPreset('covid')">2020 Covid<br><small style="font-weight:400">-33% yr 5</small></button>
+            <button class="btn btn-outline btn-sm" onclick="loadPreset('gfc')">2008 GFC<br><small style="font-weight:400">-45% yr 3</small></button>
+            <button class="btn btn-outline btn-sm" onclick="loadPreset('dotcom')">2000 Dotcom<br><small style="font-weight:400">-40% yr 2</small></button>
+            <button class="btn btn-outline btn-sm" onclick="loadPreset('double')">Double Dip<br><small style="font-weight:400">-25% yr 3+8</small></button>
+          </div>
+          <button class="btn" onclick="runAll()" style="margin-top:10px"><span>Run Shock Analysis</span></button>
         </div>
-    </div>`;
+      </div>
+    </div>
+    <div id="shockResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#9889;</div><div class="empty-title">Market Shock Analysis</div><div class="empty-body">Add shock events on the left and click Run Shock Analysis.</div></div></div></div>
+  </div>
+</div>
+</div>
 
-    area.innerHTML = html;
+<div id="tab-stress" class="tab-content">
+<div class="main-full" id="stressResults">
+  <div class="rpanel"><div class="empty"><div class="empty-icon">&#127777;</div><div class="empty-title">Stress Testing</div><div class="empty-body">Run Full Analysis from the Drawdown tab to populate stress tests.</div></div></div>
+</div>
+</div>
 
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: rows.map(r => r.age),
-            datasets: [{
-                label: 'Total Capital',
-                data: rows.map(r => r.total),
-                borderColor: '#1C3F7A',
-                backgroundColor: 'rgba(28,63,122,0.1)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, ticks: { callback: v => f(v) } }
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
+<div id="tab-monte" class="tab-content">
+<div class="main-full">
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-hd-icon">&#127922;</div><span class="panel-hd-title">Monte Carlo Settings</span></div>
+        <div class="panel-bd">
+          <p style="font-size:11.5px;color:var(--ink3);margin-bottom:10px;line-height:1.7">Runs random return sequences using your growth rate as the mean. Shows probability of plan success across all strategies.</p>
+          <div class="fld suf"><label>Return Volatility (Std Dev)</label><div class="wrap"><input type="number" id="mcVol" value="12" step="1" min="5" max="30"><span class="suf">%</span></div></div>
+          <div class="fld"><label>Simulations</label><div class="wrap"><select id="mcSims"><option value="200">200 (fast)</option><option value="500" selected>500 (standard)</option><option value="1000">1,000 (precise)</option></select></div></div>
+          <div class="fld"><label>Success = fund survives to age</label><div class="wrap"><input type="number" id="mcTarget" value="90" step="1" min="75" max="100"></div></div>
+          <button class="btn" onclick="runMonte()"><span>Run Monte Carlo</span></button>
+        </div>
+      </div>
+    </div>
+    <div id="monteResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#127922;</div><div class="empty-title">Monte Carlo Simulation</div><div class="empty-body">Run Full Analysis first, then click Run Monte Carlo.</div></div></div></div>
+  </div>
+</div>
+</div>
+
+<div id="tab-iht" class="tab-content">
+<div class="main-full">
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-hd-icon">&#127963;</div><span class="panel-hd-title">IHT &amp; Estate Planning</span></div>
+        <div class="panel-bd">
+          <div class="fld pre"><label>Main Residence Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtProperty" value="500000" step="10000"></div></div>
+          <div class="fld suf"><label>Property Growth Rate</label><div class="wrap"><input type="number" id="ihtPropGrowth" value="3.0" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld pre"><label>Mortgage Outstanding</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtMortgage" value="0" step="5000"></div></div>
+          <div class="fld pre"><label>Other Assets</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtOther" value="20000" step="5000"></div></div>
+          <div class="sl">IHT Allowances</div>
+          <div class="fld pre"><label>Nil Rate Band</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="nrb" value="325000" step="5000"></div></div>
+          <div class="fld pre"><label>RNRB (residence, direct descendants)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="rnrb" value="175000" step="5000"></div></div>
+          <div class="fld suf"><label>IHT Rate</label><div class="wrap"><input type="number" id="ihtRate" value="40" step="5"><span class="suf">%</span></div></div>
+          <div class="sl">Pension IHT (April 2027)</div>
+          <div class="toggle-row"><span class="toggle-lbl">Include pension in estate</span><div class="toggle on" id="pensionIHTToggle" onclick="togglePensionIHT()"></div></div>
+          <div class="fld"><label>Death Age (for projection)</label><div class="wrap"><input type="number" id="ihtDeathAge" value="85" step="1"></div></div>
+          <button class="btn" onclick="runIHT()"><span>Calculate Estate</span></button>
+        </div>
+      </div>
+    </div>
+    <div id="ihtResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#127963;</div><div class="empty-title">IHT &amp; Estate Projection</div><div class="empty-body">Run the Drawdown analysis first, then click Calculate Estate.</div></div></div></div>
+  </div>
+</div>
+</div>
+
+<div id="tab-tax" class="tab-content">
+<div class="main-full" id="taxResults">
+  <div class="rpanel"><div class="empty"><div class="empty-icon">&#9878;</div><div class="empty-title">Tax Band Optimiser</div><div class="empty-body">Run the Drawdown analysis first to populate the year-by-year tax band breakdown.</div></div></div>
+</div>
+</div>
+
+<div class="footer">For illustrative purposes only &nbsp;&middot;&nbsp; Not financial advice &nbsp;&middot;&nbsp; Tax treatment depends on individual circumstances and may change &nbsp;&middot;&nbsp; Figures are projections only and not guaranteed</div>
+
+<script>
+var shocks=[];
+var lastP=null,lastBl=null,lastPf=null,lastIf_=null,lastOb_=null;
+var pensionInEstate=true;
+
+function g(id){return parseFloat(document.getElementById(id).value)||0;}
+function ff(v){if(!v&&v!==0)return'--';if(v===0)return'--';var n=v<0,a=Math.abs(v);return(n?'-':'')+'&#163;'+Math.round(a).toLocaleString('en-GB');}
+function ffz(v){if(v==null||isNaN(v))return'--';var n=v<0,a=Math.abs(v);return(n?'-':'')+'&#163;'+Math.round(a).toLocaleString('en-GB');}
+function fmt(v){if(v==null||isNaN(v))return'--';var n=v<0,a=Math.abs(v);var s=a>=1e6?(a/1e6).toFixed(2)+'m':a>=1000?Math.round(a/1000)+'k':Math.round(a)+'';return(n?'-':'')+'&#163;'+s;}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleAnnuity(){
+  var t=document.getElementById('annuityToggle');
+  t.classList.toggle('on');
+  document.getElementById('annuityFields').style.display=t.classList.contains('on')?'block':'none';
+}
+function togglePensionIHT(){
+  document.getElementById('pensionIHTToggle').classList.toggle('on');
+  pensionInEstate=document.getElementById('pensionIHTToggle').classList.contains('on');
 }
 
-// Initial Run
-calculate();
+function getParams(){
+  return{
+    pension:g('pension'),isa:g('isa'),gia:g('gia'),pcls:g('pcls'),
+    ob:g('ob'),obg:g('obg')/100,obYrs:g('obYrs'),
+    dbAmt:g('dbAmt'),dbAge:g('dbAge'),dbIdx:g('dbIdx')/100,
+    divAmt:g('divAmt'),divGrowth:g('divGrowth')/100,divTax:g('divTax')/100,
+    annuityOn:document.getElementById('annuityToggle').classList.contains('on'),
+    annuityAge:g('annuityAge'),annuityPot:g('annuityPot'),annuityRate:g('annuityRate')/100,
+    sa:g('sa'),ty:g('ty'),ca:g('ca'),
+    sp1:g('sp1'),sp2:g('sp2'),t1:g('t1')/100,t2:g('t2')/100,cg:g('cg')/100,
+    spAmt:g('spAmt'),spAge:g('spAge'),spIdx:g('spIdx')/100,
+    rental:g('rental'),rentalAge:g('rentalAge'),rentalEnd:g('rentalEnd'),rentalIdx:g('rentalIdx')/100,
+    trust:g('trust'),trustAge:g('trustAge'),trustEnd:g('trustEnd'),trustIdx:g('trustIdx')/100,
+    i1:g('i1')/100,i2:g('i2')/100,
+    pg:g('pg')/100,ig:g('ig')/100,gg:g('gg')/100,fees:g('fees')/100
+  };
+}
+
+function runStrategy(p,strat,shockMap,growthOverride){
+  var PG=(growthOverride!=null?growthOverride:p.pg)-p.fees;
+  var IG=(growthOverride!=null?growthOverride:p.ig)-p.fees;
+  var GG=(growthOverride!=null?growthOverride:p.gg)-p.fees;
+  var OBG=(growthOverride!=null?growthOverride:p.obg)-p.fees;
+  var T1=p.t1,T2=p.t2,CG=p.cg;
+  var cYr=p.ca-p.sa+1;
+  var pB=p.pension-p.pcls,iB=p.isa,gB=p.gia,obB=p.ob;
+  var obOrig=p.ob,obEx=p.obYrs;
+  var annuityIncome=0,annuityBought=false;
+  var totTax=0,totShortfall=0,depleted=false,depAge=null;
+  var rows=[];
+  var divBase=p.divAmt;
+
+  for(var yr=1;yr<=p.ty;yr++){
+    var age=p.sa+yr-1;
+    var ph=yr>=cYr?2:1;
+    var tax=ph===2?T2:T1;
+    var inf=ph===2?p.i2:p.i1;
+    var phYr=ph===2?yr-cYr+1:yr;
+    var tns=(ph===2?p.sp2:p.sp1)*Math.pow(1+inf,phYr-1);
+
+    if(shockMap&&shockMap[yr]){
+      var sf=1+shockMap[yr]/100;
+      pB*=sf;iB*=sf;gB*=sf;obB*=sf;
+    }
+
+    if(p.annuityOn&&!annuityBought&&age>=p.annuityAge&&pB>=p.annuityPot){
+      pB-=p.annuityPot;
+      annuityIncome=p.annuityPot*p.annuityRate;
+      annuityBought=true;
+    }
+
+    var spG=age>=p.spAge?p.spAmt*Math.pow(1+p.spIdx,age-p.spAge):0;
+    var spN=spG*(1-tax);
+    var dbG=age>=p.dbAge?p.dbAmt*Math.pow(1+p.dbIdx,age-p.dbAge):0;
+    var dbN=dbG*(1-tax);
+    var rEnd=p.rentalEnd>0?p.rentalEnd:9999;
+    var rentalG=(p.rental>0&&age>=p.rentalAge&&age<rEnd)?p.rental*Math.pow(1+p.rentalIdx,Math.max(0,age-p.rentalAge)):0;
+    var tEnd=p.trustEnd>0?p.trustEnd:9999;
+    var trustG=(p.trust>0&&age>=p.trustAge&&age<tEnd)?p.trust*Math.pow(1+p.trustIdx,Math.max(0,age-p.trustAge)):0;
+    var annG=annuityBought?annuityIncome*(1-tax):0;
+    var divG=divBase*Math.pow(1+p.divGrowth,yr-1);
+    var divN=divG*(1-p.divTax);
+    var extIncome=spN+dbN+rentalG+trustG+annG+divN;
+    var extTax=(spG-spN)+(dbG-dbN)+(divG-divN)+(annuityBought?annuityIncome*tax:0);
+    var needed=Math.max(0,tns-extIncome);
+    var fp=0,fi=0,fg=0,fob=0,taxP=extTax;
+    var obAllow=obEx>0?obOrig*0.05:0;
+
+    if(!depleted){
+      var r=0;
+      if(strat==='pension'){
+        fp=pB>0&&needed>0?Math.min(pB,needed/(1-tax)):0;taxP+=fp*tax;
+        r=Math.max(0,needed-fp*(1-tax));
+        fi=Math.min(iB,r);r=Math.max(0,r-fi);
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        if(r>0&&obB>0){if(obEx>0){fob=Math.min(obB,Math.min(obAllow,r));}else{fob=Math.min(obB,r/(1-tax));taxP+=fob*tax;}}
+      }else if(strat==='isa'){
+        fi=Math.min(iB,needed);r=Math.max(0,needed-fi);
+        if(r>0&&obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,r));r=Math.max(0,r-fob);}
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        fp=pB>0&&r>0?r/(1-tax):0;taxP+=fp*tax;
+      }else if(strat==='offshore'){
+        if(obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,needed));}
+        else if(obB>0&&needed>0){fob=Math.min(obB,needed/(1-tax));taxP+=fob*tax;}
+        var obNet=obEx>0?fob:fob*(1-tax);
+        r=Math.max(0,needed-obNet);
+        fi=Math.min(iB,r);r=Math.max(0,r-fi);
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        fp=pB>0&&r>0?r/(1-tax):0;taxP+=fp*tax;
+      }else{
+        var pa=12570;fp=Math.min(pB,pa);
+        r=Math.max(0,needed-fp);
+        if(r>0&&obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,r));r=Math.max(0,r-fob);}
+        if(r>0){fi=Math.min(iB,r);r=Math.max(0,r-fi);}
+        if(r>0){fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);}
+        if(r>0&&pB-fp>0){var ex=r/(1-tax);fp+=ex;taxP+=ex*tax;}
+        if(fob>0&&obEx<=0){taxP+=fob*tax;}
+      }
+      if(fob>0&&obEx>0)obEx--;
+      pB=Math.max(0,pB-fp)*(1+PG);
+      iB=Math.max(0,iB-fi)*(1+IG);
+      gB=Math.max(0,gB-fg)*(1+GG);
+      obB=Math.max(0,obB-fob)*(1+OBG);
+      totTax+=taxP;
+      if(pB<=0&&iB<=0&&gB<=0&&obB<=0&&!depleted){depleted=true;depAge=age;}
+    }else{pB=0;iB=0;gB=0;obB=0;}
+
+    var total=pB+iB+gB+obB;
+    var shortfall=depleted&&needed>0?needed:0;
+    totShortfall+=shortfall;
+    rows.push({
+      age:age,ph:ph,tns:tns,spN:spN,dbN:dbN,rentalG:rentalG,trustG:trustG,
+      annG:annG,divN:divN,extIncome:extIncome,needed:needed,
+      fp:fp,fi:fi,fg:fg,fob:fob,taxP:taxP,obExLeft:obEx,
+      pB:pB,iB:iB,gB:gB,obB:obB,total:total,
+      shortfall:shortfall,depleted:depleted,
+      shock:shockMap&&shockMap[yr]?shockMap[yr]:0,
+      grossIncome:spG+dbG+fp+fob+rentalG+trustG+divG
+    });
+  }
+  return{rows:rows,totTax:totTax,totShortfall:totShortfall,final:pB+iB+gB+obB,depAge:depAge};
+}
+
+var C={
+  pension:'#1C3F7A',isa:'#1A5C3A',gia:'#4A7C6F',ob:'#2C5F8A',
+  sp:'#3D6480',rental:'#2E7D52',trust:'#4A6FA5',db:'#5C3A7A',
+  annuity:'#92600A',div:'#1A5C7A',
+  forest:'#1A5C3A',fern:'#2E7D52',sage:'#4A7C6F',steel:'#2C5F8A',
+  amber:'#92600A',slate:'#3D6480',err:'#B91C1C',
+  pfLine:'#8C9BB5',isaLine:'#2C5F8A',obLine:'#4A7C6F',blLine:'#1C3F7A'
+};
+
+function drawLine(id,rows,keys,cols,dashes,bands){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=200;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:12,r:14,b:26,l:66};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var all=[];
+  rows.forEach(function(r){keys.forEach(function(k){if(r[k]!=null)all.push(r[k]);});});
+  if(bands){bands.forEach(function(b){b.hi.forEach(function(v){all.push(v);});b.lo.forEach(function(v){all.push(v);});});}
+  var mn=Math.min(0,Math.min.apply(null,all)),mx=Math.max.apply(null,all)||1,rng=mx-mn;
+  function xp(i){return pd.l+(rows.length>1?i*cW/(rows.length-1):cW/2);}
+  function yp(v){return pd.t+cH-(v-mn)/rng*cH;}
+  ctx.strokeStyle='rgba(0,0,0,0.05)';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH*i/4;
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(fmt(mx-rng*i/4),2,y+3);
+  }
+  if(bands){
+    bands.forEach(function(b){
+      ctx.beginPath();ctx.moveTo(xp(0),yp(b.hi[0]));
+      for(var i=1;i<rows.length;i++)ctx.lineTo(xp(i),yp(b.hi[i]));
+      for(var i=rows.length-1;i>=0;i--)ctx.lineTo(xp(i),yp(b.lo[i]||0));
+      ctx.closePath();ctx.fillStyle=b.color;ctx.fill();
+    });
+  }
+  rows.forEach(function(r,ri){
+    if(r.shock&&r.shock<0){
+      ctx.fillStyle='rgba(185,28,28,0.1)';
+      ctx.fillRect(xp(ri)-2,pd.t,4,cH);
+    }
+  });
+  keys.forEach(function(k,ki){
+    ctx.strokeStyle=cols[ki];ctx.lineWidth=ki===keys.length-1?2.5:1.5;
+    ctx.globalAlpha=ki===keys.length-1?1:0.65;
+    ctx.setLineDash(dashes&&dashes[ki]?dashes[ki]:[]);
+    ctx.beginPath();var st=false;
+    rows.forEach(function(r,ri){
+      if(r[k]==null)return;
+      if(!st){ctx.moveTo(xp(ri),yp(r[k]));st=true;}
+      else ctx.lineTo(xp(ri),yp(r[k]));
+    });
+    ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  });
+  ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';
+  rows.forEach(function(r,ri){if(ri%5===0)ctx.fillText(r.age,xp(ri)-6,H-4);});
+}
+
+function drawBar(id,rows,keys,cols){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=180;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:12,r:14,b:26,l:66};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var mx=0;
+  rows.forEach(function(r){var s=0;keys.forEach(function(k){s+=(r[k]||0);});s+=(r.shortfall||0);if(s>mx)mx=s;});
+  if(!mx)return;
+  var bW=cW/rows.length,gap=0.5;
+  ctx.strokeStyle='rgba(0,0,0,0.05)';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH-(cH*i/4);
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(fmt(mx*i/4),2,y+3);
+  }
+  rows.forEach(function(r,ri){
+    var x=pd.l+ri*bW+gap/2,by=pd.t+cH;
+    if(r.shock&&r.shock<0){ctx.fillStyle='rgba(185,28,28,0.07)';ctx.fillRect(x,pd.t,bW-gap,cH);}
+    keys.forEach(function(k,ki){var v=r[k]||0,bh=v/mx*cH;if(bh>0){ctx.fillStyle=cols[ki];ctx.fillRect(x,by-bh,bW-gap,bh);by-=bh;}});
+    if(r.shortfall>0){var sh=r.shortfall/mx*cH;ctx.fillStyle='rgba(185,28,28,0.4)';ctx.fillRect(x,by-sh,bW-gap,sh);}
+    if(ri%5===0){ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(r.age,pd.l+ri*bW+bW/2-6,H-4);}
+  });
+}
+
+function renderShockList(){
+  var el=document.getElementById('shockList');
+  el.innerHTML='';
+  shocks.forEach(function(s,i){
+    var row=document.createElement('div');
+    row.className='shock-row-input';
+    row.innerHTML='<div style="flex:1"><div style="font-size:10px;color:var(--ink4);margin-bottom:2px">Year '+s.yr+' (age '+(g('sa')+s.yr-1)+') &mdash; '+s.fall+'% fall</div>'
+      +'<input type="range" min="1" max="35" value="'+s.yr+'" style="width:100%;accent-color:#B91C1C" oninput="shocks['+i+'].yr=+this.value;renderShockList()">'
+      +'</div>'
+      +'<div style="width:75px"><input type="number" value="'+s.fall+'" min="-70" max="-5" step="5" style="width:100%" oninput="shocks['+i+'].fall=+this.value;renderShockList()"></div>'
+      +'<div class="shock-del" onclick="shocks.splice('+i+',1);renderShockList()">&#215;</div>';
+    el.appendChild(row);
+  });
+}
+function addShock(){if(shocks.length>=4)return;shocks.push({yr:5,fall:-30});renderShockList();}
+function loadPreset(name){
+  var presets={covid:[{yr:5,fall:-33}],gfc:[{yr:3,fall:-45}],dotcom:[{yr:2,fall:-40}],double:[{yr:3,fall:-25},{yr:8,fall:-25}]};
+  shocks=presets[name]||[];renderShockList();
+}
+renderShockList();
+
+function runAll(){
+  var p=getParams();
+  lastP=p;
+  var shockMap={};
+  shocks.forEach(function(s){shockMap[s.yr]=(shockMap[s.yr]||0)+s.fall;});
+
+  var pf=runStrategy(p,'pension',null,null);
+  var if_=runStrategy(p,'isa',null,null);
+  var ob_=runStrategy(p,'offshore',null,null);
+  var bl=runStrategy(p,'blended',null,null);
+  var bl_shock=runStrategy(p,'blended',shockMap,null);
+
+  lastBl=bl;lastPf=pf;lastIf_=if_;lastOb_=ob_;
+
+  var saving=pf.totTax-bl.totTax;
+  var cmpRows=[];
+  for(var i=0;i<p.ty;i++){
+    cmpRows.push({
+      age:p.sa+i,
+      pf:pf.rows[i]?pf.rows[i].total:0,
+      'if':if_.rows[i]?if_.rows[i].total:0,
+      ob:ob_.rows[i]?ob_.rows[i].total:0,
+      bl:bl.rows[i]?bl.rows[i].total:0,
+      shock:shockMap[i+1]||0
+    });
+  }
+
+  var html='';
+  html+='<div class="banner" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">';
+  html+='<div style="font-size:20px;margin-top:1px">&#10003;</div><div>';
+  html+='<div class="banner-title" style="color:var(--forest)">Optimal Strategy: Blended &mdash; Saving '+ffz(saving)+' vs pension-first</div>';
+  html+='<div class="banner-body">';
+  html+='Pension First: <strong style="color:var(--err)">'+ffz(pf.totTax)+'</strong> tax';
+  html+=' &nbsp;&middot;&nbsp; ISA First: <strong style="color:var(--steel)">'+ffz(if_.totTax)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Offshore First: <strong style="color:var(--sage)">'+ffz(ob_.totTax)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Blended: <strong style="color:var(--forest)">'+ffz(bl.totTax)+'</strong>';
+  if(bl.totShortfall>0)html+='<br><strong style="color:var(--err)">&#9888; Total cumulative shortfall: '+ffz(bl.totShortfall)+'</strong>';
+  html+='</div></div></div>';
+
+  var strats=[
+    {lb:'Pension First',sr:pf,top:'#8C9BB5',c:'#8C9BB5'},
+    {lb:'ISA First',sr:if_,top:C.ob,c:C.ob},
+    {lb:'Offshore First',sr:ob_,top:C.sage,c:C.sage},
+    {lb:'Blended &#9733;',sr:bl,top:C.pension,c:C.pension}
+  ];
+  html+='<div class="kpi-grid">';
+  strats.forEach(function(s){
+    html+='<div class="kpi-card" style="border-top-color:'+s.top+'">';
+    html+='<div class="kpi-lbl" style="color:'+s.c+'">'+s.lb+'</div>';
+    html+='<div class="kpi-v" style="color:'+(s.sr.final>0?s.c:'var(--err)')+'">'+fmt(s.sr.final)+'</div>';
+    html+='<div class="kpi-note">Final fund</div>';
+    html+='<div style="margin-top:8px"><div class="kpi-lbl">Tax paid</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:14px;color:var(--err)">'+ffz(s.sr.totTax)+'</div></div>';
+    html+='<div style="margin-top:6px"><div class="kpi-lbl">Lasts to</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:13px;color:'+(s.sr.depAge?'var(--err)':s.c)+'">'+(s.sr.depAge?'Age '+s.sr.depAge:'No depletion')+'</div></div>';
+    if(s.sr.totShortfall>0){html+='<div style="margin-top:6px"><div class="kpi-lbl">Shortfall</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:var(--err)">'+ffz(s.sr.totShortfall)+'</div></div>';}
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Portfolio Value &mdash; All Strategies</span>';
+  html+='<div class="leg"><span class="leg-item"><span class="leg-dot" style="background:#8C9BB5"></span>Pension</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.ob+'"></span>ISA</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.sage+'"></span>Offshore</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Blended</span></div></div>';
+  html+='<div class="rpanel-bd"><canvas id="lineChart" style="width:100%;display:block"></canvas></div></div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Income Sources &mdash; Blended</span>';
+  html+='<div class="leg">';
+  var legItems=[['Pension',C.pension],['ISA',C.isa],['GIA',C.gia],['Offshore',C.ob],['State Pen',C.sp],['DB',C.db],['Rental',C.rental],['Trust',C.trust],['Annuity',C.annuity],['Dividends',C.div],['Shortfall','rgba(185,28,28,.4)']];
+  legItems.forEach(function(li){html+='<span class="leg-item"><span class="leg-dot" style="background:'+li[1]+'"></span>'+li[0]+'</span>';});
+  html+='</div></div><div class="rpanel-bd"><canvas id="barChart" style="width:100%;display:block"></canvas></div></div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Year-by-Year &mdash; Blended Strategy</span>';
+  html+='<span style="font-size:10px;color:var(--err);font-weight:600">&#9888; Red = depleted &middot; Orange = shock year</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  var hdrs=[{t:'Age',L:true},{t:'Ph',L:true},{t:'Target'},{t:'State Pen',c:C.sp},{t:'DB',c:C.db},
+    {t:'Rental',c:C.rental},{t:'Divs',c:C.div},{t:'Annuity',c:C.annuity},
+    {t:'Pension',c:C.pension},{t:'ISA',c:C.isa},{t:'GIA',c:C.gia},{t:'Offshore',c:C.ob},
+    {t:'OB Yrs'},{t:'Tax',c:'#B91C1C'},{t:'Fund Total'},{t:'Shortfall',c:'#B91C1C'}];
+  hdrs.forEach(function(h){html+='<th'+(h.L?' class="L"':'')+' style="'+(h.c?'color:'+h.c:'')+'">' +h.t+'</th>';});
+  html+='</tr></thead><tbody>';
+
+  bl.rows.forEach(function(row){
+    var dep=row.depleted,shk=row.shock<0;
+    var cls=dep?' class="depl-row"':shk?' class="shock-row"':'';
+    var phB=row.ph===1
+      ?'<span class="badge" style="background:rgba(28,63,122,.08);color:#1C3F7A;border:1px solid rgba(28,63,122,.2)">P1</span>'
+      :'<span class="badge" style="background:rgba(185,28,28,.07);color:#B91C1C;border:1px solid rgba(185,28,28,.2)">P2</span>';
+    var obY=row.obExLeft>0
+      ?'<span style="color:'+C.steel+';font-weight:600">'+row.obExLeft+'</span>'
+      :'<span style="color:#B91C1C;font-size:9px;font-weight:700">Taxable</span>';
+    var fundCol=row.total<=0?'#B91C1C':row.total<30000?'#B45309':'var(--ink)';
+    html+='<tr'+cls+'>';
+    html+='<td class="L" style="color:'+(dep?'#B91C1C':shk?'#B45309':'var(--ink)')+(shk?';font-weight:700':'')+'">'+(shk?'&#9889; ':'')+row.age+'</td>';
+    html+='<td class="L">'+phB+'</td>';
+    html+='<td>'+ffz(row.tns)+'</td>';
+    html+='<td style="color:'+C.sp+'">'+ffz(row.spN)+'</td>';
+    html+='<td style="color:'+C.db+'">'+ffz(row.dbN)+'</td>';
+    html+='<td style="color:'+C.rental+'">'+ffz(row.rentalG)+'</td>';
+    html+='<td style="color:'+C.div+'">'+ffz(row.divN)+'</td>';
+    html+='<td style="color:'+C.annuity+'">'+ffz(row.annG)+'</td>';
+    html+='<td style="color:'+C.pension+'">'+ff(row.fp)+'</td>';
+    html+='<td style="color:'+C.isa+'">'+ff(row.fi)+'</td>';
+    html+='<td style="color:'+C.gia+'">'+ff(row.fg)+'</td>';
+    html+='<td style="color:'+C.ob+'">'+ff(row.fob)+'</td>';
+    html+='<td style="text-align:center">'+obY+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:600">'+ff(row.taxP)+'</td>';
+    html+='<td style="color:'+fundCol+';font-weight:700">'+ffz(row.total)+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(row.shortfall>0?ffz(row.shortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong style="color:var(--royal)">Blended Sequencing</strong><br>';
+  html+='Pension to personal allowance (&#163;12,570) &#8594; OB 5% allowance &#8594; ISA &#8594; GIA (CGT) &#8594; Pension top-up. ';
+  html+='DB, state pension, annuity, rental, trust and dividends all reduce capital draw each year.<br>';
+  html+='<strong style="color:#B91C1C">Post-depletion:</strong> model continues to age '+(p.sa+p.ty-1)+' showing annual shortfall every year.';
+  html+='</div></div>';
+
+  document.getElementById('results').innerHTML=html;
+  setTimeout(function(){
+    drawLine('lineChart',cmpRows,['pf','if','ob','bl'],[C.pfLine,C.isaLine,C.obLine,C.blLine],[[5,4],[4,3],[3,2],[]],null);
+    drawBar('barChart',bl.rows,['fp','fi','fg','fob','spN','dbN','rentalG','trustG','annG','divN'],
+      [C.pension,C.isa,C.gia,C.ob,C.sp,C.db,C.rental,C.trust,C.annuity,C.div]);
+  },60);
+
+  buildShockResults(p,pf,if_,ob_,bl,bl_shock,shockMap);
+  buildStressResults(p);
+  buildTaxResults(p,bl);
+}
+
+function buildShockResults(p,pf,if_,ob_,bl,bl_shock,shockMap){
+  if(Object.keys(shockMap).length===0){
+    document.getElementById('shockResults').innerHTML='<div class="rpanel"><div class="empty"><div class="empty-icon">&#9889;</div><div class="empty-title">No Shocks Defined</div><div class="empty-body">Add shock events on the left panel to see impact analysis.</div></div></div>';
+    return;
+  }
+  var pf_s=runStrategy(p,'pension',shockMap,null);
+  var if_s=runStrategy(p,'isa',shockMap,null);
+  var ob_s=runStrategy(p,'offshore',shockMap,null);
+
+  var shockDesc=shocks.map(function(s){return s.fall+'% in year '+s.yr+' (age '+(p.sa+s.yr-1)+')';}).join(', ');
+
+  var html='';
+  html+='<div class="banner" style="background:rgba(185,28,28,.05);border-color:rgba(185,28,28,.2);border-left-color:#B91C1C">';
+  html+='<div style="font-size:20px">&#9889;</div><div>';
+  html+='<div class="banner-title" style="color:#B91C1C">Market Shock: '+shockDesc+'</div>';
+  html+='<div class="banner-body">';
+  html+='Blended fund impact vs base: <strong style="color:#B91C1C">'+ffz(bl_shock.final-bl.final)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Additional shortfall: <strong style="color:#B91C1C">'+ffz(bl_shock.totShortfall-bl.totShortfall)+'</strong>';
+  html+='</div></div></div>';
+
+  html+='<div class="scenario-grid">';
+  var ss=[
+    {lb:'Pension First (shocked)',sr:pf_s,base:pf,c:'#8C9BB5'},
+    {lb:'Blended (base)',sr:bl,base:bl,c:C.pension},
+    {lb:'Blended (shocked)',sr:bl_shock,base:bl,c:C.err}
+  ];
+  ss.forEach(function(s){
+    var diff=s.sr!==s.base?s.sr.final-s.base.final:null;
+    html+='<div class="scenario-card" style="background:var(--bg2);border-color:var(--border)">';
+    html+='<div class="scenario-title" style="color:var(--ink)">'+s.lb+'</div>';
+    html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Final Fund</div>';
+    html+='<div class="scenario-stat-val" style="color:'+(s.sr.final>0?s.c:'#B91C1C')+'">'+fmt(s.sr.final)+'</div></div>';
+    if(diff!==null){html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Shock Impact</div><div class="scenario-stat-val" style="color:#B91C1C">'+ffz(diff)+'</div></div>';}
+    html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Fund Lasts To</div>';
+    html+='<div class="scenario-stat-val" style="color:'+(s.sr.depAge?'#B91C1C':s.c)+'">'+(s.sr.depAge?'Age '+s.sr.depAge:'No depletion')+'</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Base vs Shocked — Blended Strategy</span></div>';
+  html+='<div class="rpanel-bd"><canvas id="shockLineChart" style="width:100%;display:block"></canvas>';
+  html+='<div class="band-note">&#9889; Vertical shading marks shock years. Dashed red = shocked scenario.</div></div></div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Year-by-Year: Base vs Shocked</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  html+='<th class="L">Age</th><th>Base Fund</th><th>Shocked Fund</th><th>Difference</th><th>Shocked Shortfall</th></tr></thead><tbody>';
+  bl.rows.forEach(function(row,i){
+    var sr=bl_shock.rows[i];
+    var diff=sr.total-row.total;
+    var shk=shockMap[i+1]<0;
+    html+='<tr'+(shk?' class="shock-row"':'')+'>';
+    html+='<td class="L">'+(shk?'&#9889; ':'')+row.age+'</td>';
+    html+='<td style="font-weight:700;color:var(--ink)">'+ffz(row.total)+'</td>';
+    html+='<td style="font-weight:700;color:'+(sr.total<row.total?'#B91C1C':'#166534')+'">'+ffz(sr.total)+'</td>';
+    html+='<td style="color:#B91C1C">'+ffz(diff)+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(sr.shortfall>0?ffz(sr.shortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  document.getElementById('shockResults').innerHTML=html;
+  setTimeout(function(){
+    var blBase=[];
+    bl.rows.forEach(function(r,i){
+      blBase.push({age:r.age,bl:r.total,blShock:bl_shock.rows[i].total,shock:shockMap[i+1]||0});
+    });
+    drawLine('shockLineChart',blBase,['bl','blShock'],[C.pension,'#B91C1C'],[[],[4,3]],null);
+  },60);
+}
+
+function buildStressResults(p){
+  var scenarios=[
+    {lb:'Base Case',inf1:p.i1,inf2:p.i2,gr:p.pg,color:C.forest},
+    {lb:'High Inflation (6%/8%)',inf1:0.06,inf2:0.08,gr:p.pg,color:C.amber},
+    {lb:'Low Returns (2%)',inf1:p.i1,inf2:p.i2,gr:0.02,color:'#B45309'},
+    {lb:'Stagflation (5%inf/2%gr)',inf1:0.05,inf2:0.07,gr:0.02,color:C.err},
+    {lb:'Long Life to Age 100',inf1:p.i1,inf2:p.i2,gr:p.pg,extra:15,color:C.steel},
+    {lb:'Best Case (7%gr/1.5%inf)',inf1:0.015,inf2:0.025,gr:0.07,color:C.royal||C.pension}
+  ];
+
+  var results=scenarios.map(function(sc){
+    var sp={};
+    for(var k in p)sp[k]=p[k];
+    sp.i1=sc.inf1;sp.i2=sc.inf2;sp.pg=sc.gr;sp.ig=sc.gr;sp.gg=sc.gr*0.9;
+    if(sc.extra)sp.ty=p.ty+sc.extra;
+    var r=runStrategy(sp,'blended',null,null);
+    return{lb:sc.lb,color:sc.color,inf1:sc.inf1,inf2:sc.inf2,gr:sc.gr,
+      final:r.final,totTax:r.totTax,totShortfall:r.totShortfall,depAge:r.depAge,rows:r.rows};
+  });
+
+  var html='<div class="kpi-grid-5">';
+  for(var i=0;i<5;i++){
+    var r=results[i];
+    html+='<div class="kpi-card" style="border-top-color:'+r.color+'">';
+    html+='<div class="kpi-lbl" style="color:'+r.color+'">'+r.lb+'</div>';
+    html+='<div class="kpi-v" style="font-size:14px;color:'+(r.final>0?r.color:'#B91C1C')+'">'+fmt(r.final)+'</div>';
+    html+='<div class="kpi-note">Final fund (blended)</div>';
+    html+='<div style="margin-top:6px"><div class="kpi-lbl">Tax paid</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:#B91C1C">'+ffz(r.totTax)+'</div></div>';
+    html+='<div style="margin-top:5px"><div class="kpi-lbl">Lasts to</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:'+(r.depAge?'#B91C1C':r.color)+'">'+(r.depAge?'Age '+r.depAge:'Survives')+'</div></div>';
+    if(r.totShortfall>0){html+='<div style="margin-top:5px"><div class="kpi-lbl">Shortfall</div><div style="font-family:\'Source Code Pro\',monospace;font-size:11px;color:#B91C1C">'+ffz(r.totShortfall)+'</div></div>';}
+    html+='</div>';
+  }
+  html+='</div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Scenario Comparison Table</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  html+='<th class="L">Scenario</th><th>Inflation P1</th><th>Inflation P2</th><th>Growth</th><th>Final Fund</th><th>Tax Paid</th><th>Lasts To</th><th>Shortfall</th></tr></thead><tbody>';
+  results.forEach(function(r){
+    html+='<tr>';
+    html+='<td class="L" style="font-weight:700;color:'+r.color+'">'+r.lb+'</td>';
+    html+='<td>'+(r.inf1*100).toFixed(1)+'%</td>';
+    html+='<td>'+(r.inf2*100).toFixed(1)+'%</td>';
+    html+='<td>'+(r.gr*100).toFixed(1)+'%</td>';
+    html+='<td style="font-weight:700;color:'+(r.final>0?r.color:'#B91C1C')+'">'+fmt(r.final)+'</td>';
+    html+='<td style="color:#B91C1C">'+ffz(r.totTax)+'</td>';
+    html+='<td style="color:'+(r.depAge?'#B91C1C':r.color)+'">'+(r.depAge?'Age '+r.depAge:'No depletion')+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(r.totShortfall>0?ffz(r.totShortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Fund Value Bands &mdash; Best / Base / Worst</span></div>';
+  html+='<div class="rpanel-bd"><canvas id="stressChart" style="width:100%;display:block"></canvas>';
+  html+='<div class="band-note">Green = best case &nbsp;&middot;&nbsp; Red = worst case (stagflation) &nbsp;&middot;&nbsp; Blue line = base case</div></div></div>';
+
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong style="color:var(--royal)">Reading the stress tests</strong><br>';
+  html+='Stagflation (high inflation + low returns) is the most destructive scenario for drawdown portfolios &mdash; it simultaneously increases spending requirements and reduces fund growth. Long-life scenarios reveal the longevity risk gap. The best/base/worst bands show the realistic spread of outcomes without single-number false precision.</div></div>';
+
+  document.getElementById('stressResults').innerHTML=html;
+  setTimeout(function(){
+    var base=results[0],best=results[5],worst=results[3];
+    var len=Math.min(base.rows.length,best.rows.length,worst.rows.length);
+    var bandRows=[];
+    for(var i=0;i<len;i++){
+      bandRows.push({age:base.rows[i].age,bl:base.rows[i].total,shock:0});
+    }
+    var hiArr=[],loArr=[];
+    for(var i=0;i<len;i++){hiArr.push(best.rows[i].total);loArr.push(worst.rows[i].total);}
+    drawLine('stressChart',bandRows,['bl'],[C.blLine],[[]],[
+      {hi:hiArr,lo:bandRows.map(function(r){return r.bl;}),color:'rgba(26,92,58,0.12)'},
+      {hi:bandRows.map(function(r){return r.bl;}),lo:loArr,color:'rgba(185,28,28,0.10)'}
+    ]);
+  },80);
+}
+
+function runMonte(){
+  if(!lastP){alert('Please run the main analysis first.');return;}
+  var p=lastP;
+  var vol=g('mcVol')/100;
+  var nsims=parseInt(document.getElementById('mcSims').value)||500;
+  var targetAge=g('mcTarget');
+
+  function randn(){
+    var u=0,v=0;
+    while(u===0)u=Math.random();
+    while(v===0)v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+
+  var stratNames=['blended','pension','isa','offshore'];
+  var stratLabels=['Blended &#9733;','Pension First','ISA First','Offshore First'];
+  var stratColors=[C.pension,'#8C9BB5',C.ob,C.sage];
+  var successes=[0,0,0,0];
+
+  for(var s=0;s<nsims;s++){
+    var avgReturn=p.pg+randn()*vol;
+    stratNames.forEach(function(strat,si){
+      var sp={};for(var k in p)sp[k]=p[k];
+      var res=runStrategy(sp,strat,null,avgReturn);
+      if(!res.depAge||res.depAge>targetAge)successes[si]++;
+    });
+  }
+
+  var html='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Probability of Success to Age '+targetAge+'</span>';
+  html+='<span style="font-size:10.5px;color:var(--ink4)">'+nsims+' simulations &middot; &plusmn;'+Math.round(vol*100)+'% annual volatility</span></div>';
+  html+='<div class="rpanel-bd">';
+
+  successes.forEach(function(sc,i){
+    var p2=Math.round(sc/nsims*100);
+    var col=p2>=80?C.forest:p2>=60?C.amber:C.err;
+    html+='<div style="margin-bottom:16px">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">';
+    html+='<span style="font-size:13px;font-weight:600;color:var(--ink)">'+stratLabels[i]+'</span>';
+    html+='<span style="font-family:\'Source Code Pro\',monospace;font-size:18px;font-weight:500;color:'+col+'">'+p2+'%</span>';
+    html+='</div>';
+    html+='<div class="mc-bar-bg"><div class="mc-bar-fill" style="width:'+p2+'%;background:'+col+'"></div></div>';
+    html+='<div style="font-size:10.5px;color:var(--ink4);margin-top:3px">'+(nsims-sc)+' of '+nsims+' simulations depleted before age '+targetAge+'</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+
+  var blPct=Math.round(successes[0]/nsims*100);
+  var interp=blPct>=85?'Strong &mdash; the blended strategy is resilient across most market conditions.':
+    blPct>=70?'Moderate &mdash; consider reducing Phase 1 spending or increasing growth assumption.':
+    blPct>=50?'Caution &mdash; significant proportion of scenarios result in shortfall. Review spending levels.':
+    'High Risk &mdash; plan needs restructuring. Spending targets likely unsustainable at current parameters.';
+
+  html+='<div class="banner" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">';
+  html+='<div style="font-size:20px">&#127922;</div><div>';
+  html+='<div class="banner-title" style="color:var(--royal)">Verdict: '+blPct+'% probability of success (Blended)</div>';
+  html+='<div class="banner-body">'+interp+'<br>';
+  html+='<strong>Note:</strong> This simulation varies annual return around your assumed growth rate. Real-world sequence-of-returns risk (poor returns in early years) is especially damaging in drawdown &mdash; the order of returns matters as much as the average.</div>';
+  html+='</div></div>';
+
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong>How to read this:</strong> An 85% result means that in 85 of 100 random market scenarios, the portfolio survives to age '+targetAge+'. The remaining 15% represent sequences where poor early returns deplete the fund before that age. Higher volatility settings will widen the spread of outcomes.</div></div>';
+
+  document.getElementById('monteResults').innerHTML=html;
+}
+
+function runIHT(){
+  if(!lastBl){alert('Please run the main analysis first.');return;}
+  var p=lastP;
+  var deathAge=g('ihtDeathAge');
+  var propVal=g('ihtProperty');
+  var propGrowth=g('ihtPropGrowth')/100;
+  var mortgage=g('ihtMortgage');
+  var otherAssets=g('ihtOther');
+  var nrb=g('nrb');
+  var rnrb=g('rnrb');
+  var ihtRate=g('ihtRate')/100;
+  var yrs=Math.max(0,deathAge-p.sa);
+
+  var deathRow=null;
+  for(var i=0;i<lastBl.rows.length;i++){
+    if(lastBl.rows[i].age>=deathAge){deathRow=lastBl.rows[i];break;}
+  }
+  if(!deathRow)deathRow=lastBl.rows[lastBl.rows.length-1];
+
+  var propAtDeath=Math.max(0,propVal*Math.pow(1+propGrowth,yrs)-mortgage);
+  var pensionAtDeath=deathRow.pB||0;
+  var isaAtDeath=deathRow.iB||0;
+  var giaAtDeath=deathRow.gB||0;
+  var obAtDeath=deathRow.obB||0;
+
+  var totalEstate=propAtDeath+isaAtDeath+giaAtDeath+obAtDeath+otherAssets;
+  if(pensionInEstate)totalEstate+=pensionAtDeath;
+
+  var ihtAllowance=nrb+rnrb;
+  var taxableEstate=Math.max(0,totalEstate-ihtAllowance);
+  var ihtBill=taxableEstate*ihtRate;
+  var netEstate=totalEstate-ihtBill;
+  var effRate=totalEstate>0?ihtBill/totalEstate:0;
+
+  var html='<div class="kpi-grid">';
+  var kpis=[
+    {lb:'Gross Estate',v:totalEstate,c:C.pension,note:'At age '+deathAge},
+    {lb:'IHT Allowances',v:ihtAllowance,c:C.forest,note:'NRB + RNRB combined'},
+    {lb:'IHT Bill',v:ihtBill,c:C.err,note:(effRate*100).toFixed(1)+'% effective rate'},
+    {lb:'Net to Beneficiaries',v:netEstate,c:C.steel,note:'After all tax'}
+  ];
+  kpis.forEach(function(item){
+    html+='<div class="kpi-card" style="border-top-color:'+item.c+'">';
+    html+='<div class="kpi-lbl">'+item.lb+'</div>';
+    html+='<div class="kpi-v" style="color:'+item.c+'">'+ffz(item.v)+'</div>';
+    html+='<div class="kpi-note">'+item.note+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Estate Composition at Age '+deathAge+'</span></div>';
+  html+='<div class="rpanel-bd">';
+  var comps=[
+    {lb:'Property (net of mortgage)',v:propAtDeath,c:C.fern,iht:true},
+    {lb:'ISA',v:isaAtDeath,c:C.forest,iht:true},
+    {lb:'GIA',v:giaAtDeath,c:C.gia,iht:true},
+    {lb:'Offshore Bond',v:obAtDeath,c:C.ob,iht:true},
+    {lb:'Pension (post-2027 rules)',v:pensionInEstate?pensionAtDeath:0,c:C.pension,iht:pensionInEstate},
+    {lb:'Other Assets',v:otherAssets,c:C.slate,iht:true}
+  ];
+  comps.forEach(function(comp){
+    if(!comp.v)return;
+    var bp=Math.min(100,Math.round(comp.v/totalEstate*100));
+    html+='<div class="taxband-row">';
+    html+='<span style="min-width:200px;font-size:11.5px;font-weight:500">'+comp.lb+'</span>';
+    html+='<div class="taxband-bar"><div class="taxband-fill" style="width:'+bp+'%;background:'+comp.c+'"></div></div>';
+    html+='<span style="min-width:90px;text-align:right;font-family:\'Source Code Pro\',monospace;font-size:11.5px;font-weight:500">'+ffz(comp.v)+'</span>';
+    html+='<span style="min-width:80px;text-align:right;font-size:10px;color:'+(comp.iht?C.err:C.forest)+'">'+
+      (comp.iht?'IHT liable':'IHT exempt')+'</span>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">IHT Exposure Meter</span></div>';
+  html+='<div class="rpanel-bd">';
+  var meterPct=Math.min(100,Math.round(ihtBill/Math.max(1,totalEstate)*100));
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">';
+  html+='<span style="font-size:12px;color:var(--ink3)">IHT as % of gross estate</span>';
+  html+='<span style="font-family:\'Source Code Pro\',monospace;font-size:18px;font-weight:500;color:'+C.err+'">'+meterPct+'%</span>';
+  html+='</div>';
+  html+='<div class="iht-meter"><div class="iht-meter-fill" style="width:'+meterPct+'%"></div></div>';
+  html+='<div style="font-size:11px;color:var(--ink4);margin-top:6px">Nil-rate band used: '+ffz(Math.min(totalEstate,ihtAllowance))+' of '+ffz(ihtAllowance)+' available</div>';
+  html+='</div></div>';
+
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong style="color:var(--royal)">April 2027 Pension Changes:</strong> Under current proposals, unused pension pots will form part of the taxable estate. This analysis ';
+  html+=(pensionInEstate?'<strong>includes</strong>':'<strong>excludes</strong>')+' the pension ('+ffz(pensionAtDeath)+') in the estate. Toggle the switch in the settings panel.<br>';
+  html+='<strong>ISA note:</strong> ISAs are subject to IHT on death. Pension drawdown before ISA can reduce the overall estate IHT exposure, particularly where the pension would have been IHT-exempt under pre-2027 rules.';
+  html+='</div></div>';
+
+  document.getElementById('ihtResults').innerHTML=html;
+}
+
+function buildTaxResults(p,bl){
+  var html='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Tax Band Usage &mdash; Year by Year (Blended)</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  html+='<th class="L">Age</th><th>Gross Income</th><th>Tax Paid</th><th>Eff. Rate</th><th>Tax Band</th><th>Optimisation Note</th></tr></thead><tbody>';
+
+  bl.rows.forEach(function(row){
+    var gross=row.grossIncome||0;
+    var effRate=gross>0?Math.round(row.taxP/gross*100):0;
+    var band,bandCol,note;
+    if(gross<=12570){band='Personal Allowance';bandCol=C.forest;note='Under PA &mdash; consider drawing more pension tax-free';}
+    else if(gross<=50270){band='Basic Rate';bandCol=C.steel;note='Optimal &mdash; within basic rate band';}
+    else if(gross<=125140){band='Higher Rate';bandCol=C.amber;note='&#9888; Higher rate &mdash; rebalance to ISA or OB draws';}
+    else{band='Additional Rate';bandCol=C.err;note='&#9888; Additional rate &mdash; maximise tax-free sources immediately';}
+    html+='<tr>';
+    html+='<td class="L">'+row.age+'</td>';
+    html+='<td style="font-weight:600">'+ffz(gross)+'</td>';
+    html+='<td style="color:'+C.err+'">'+ffz(row.taxP)+'</td>';
+    html+='<td style="color:'+bandCol+';font-weight:600">'+effRate+'%</td>';
+    html+='<td><span class="badge" style="background:'+bandCol+'22;color:'+bandCol+';border:1px solid '+bandCol+'44">'+band+'</span></td>';
+    html+='<td style="font-size:10.5px;color:var(--ink3)">'+note+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  var totalTax=bl.totTax;
+  var totalGross=0;
+  bl.rows.forEach(function(r){totalGross+=(r.grossIncome||0);});
+  var overallEff=totalGross>0?Math.round(totalTax/totalGross*100):0;
+
+  html+='<div class="kpi-grid">';
+  var kpis2=[
+    {lb:'Total Tax Paid',v:ffz(totalTax),c:C.err,note:'Over full model period'},
+    {lb:'Total Gross Income',v:ffz(totalGross),c:C.pension,note:'Before tax'},
+    {lb:'Effective Tax Rate',v:overallEff+'%',c:overallEff>25?C.err:overallEff>15?C.amber:C.forest,note:'Average over model'},
+    {lb:'Tax Saving vs Pension-First',v:ffz(lastPf?lastPf.totTax-totalTax:0),c:C.forest,note:'Blended strategy benefit'}
+  ];
+  kpis2.forEach(function(item){
+    html+='<div class="kpi-card" style="border-top-color:'+item.c+'">';
+    html+='<div class="kpi-lbl">'+item.lb+'</div>';
+    html+='<div class="kpi-v" style="color:'+item.c+'">'+item.v+'</div>';
+    html+='<div class="kpi-note">'+item.note+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong style="color:var(--royal)">Tax Band Optimisation</strong><br>';
+  html+='The blended strategy maximises use of the &#163;12,570 personal allowance from pension, then uses ISA and offshore bond allowances to stay within the basic rate band. ';
+  html+='Any year showing Higher Rate is a planning trigger &mdash; bring forward ISA withdrawals, increase OB 5% draw, or restructure care cost funding to reduce gross taxable income.</div></div>';
+
+  document.getElementById('taxResults').innerHTML=html;
+}
+
+addShock();
 </script>
 </body>
 </html>
